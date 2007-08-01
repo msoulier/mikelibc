@@ -17,4 +17,4 @@ test_logger: test_logger.c
 	$(CC) $(CFLAGS) -o test_logger test_logger.c $(LIBS)
 
 clean:
-	rm -f test_logger $(OBJS)
+	rm -f $(OBJS) $(TESTS)
