@@ -1,11 +1,14 @@
 CC=gcc
 CFLAGS=-Wall
-OBJS=debug.o logger.o
+OBJS=mikelib.o debug.o logger.o
 
 all: libmike.a
 
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
+
+mikelib.o: mikelib.c mikelib.h
+	$(CC) $(CFLAGS) -c mikelib.c
 
 debug.o: debug.c debug.h
 	$(CC) $(CFLAGS) -c debug.c
