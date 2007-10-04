@@ -1,5 +1,7 @@
 #include <time.h>
 #include <sys/time.h>
+#include <string.h>
+#include <errno.h>
 
 #include "logger.h"
 
@@ -9,6 +11,8 @@ int loggertype = LOGGER_STDOUT;
 int loggerseverity = LOGSEV_INFO;
 /* Whether to show timestamps. */
 int timestamplevel = 1;
+/* The FILE pointer of the logfile. */
+FILE *logfile = NULL;
 
 void setloggertime(int level)
 {
@@ -18,9 +22,38 @@ void setloggertime(int level)
     timestamplevel = level;
 }
 
-void setloggertype(int type)
+int setloggertype(int type, char* path)
 {
+    FILE *lfile;
+
     loggertype = type;
+    if (type == LOGGER_FILE)
+    {
+        if (path != NULL)
+        {
+            /* FIXME: We should have to specify appending or not. */
+            if ((lfile = fopen(path, "w")) == NULL)
+            {
+                perror("logfile");
+                loggertype = LOGGER_NONE;
+                return -1;
+            }
+            else
+            {
+                logfile = lfile;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Warning: Requested file logger, but path is NULL\n");
+            return -1;
+        }
+    }
+    else
+    {
+        logfile = stdout;
+    }
+    return 1;
 }
 
 void setloggersev(int severity)
@@ -39,13 +72,14 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
     char *tf;
 
     switch (timestamplevel) {
-    case 1:
+    case LOGTIME_LOCNOZONE:
         tf = tf1;
         break;
-    case 2:
+    case LOGTIME_LOCWZONE:
         tf = tf2;
         break;
     default:
+        /* LOGTIME_NONE */
         tf = tf0;
         break;
     }
@@ -60,38 +94,41 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
         return;
 
     switch (loggertype) {
+    case LOGGER_NONE:
+        return;
     case LOGGER_SYSLOG:
         fprintf(stderr, "Warning: syslog support not implemented.\n");
         /* fall through for now */
     case LOGGER_STDOUT:
+    case LOGGER_FILE:
         // FIXME - use hires timer and provide milliseconds?
         if (timestamplevel)
-            fprintf(stderr, "%s ", timebuf);
+            fprintf(logfile, "%s ", timebuf);
         switch (severity) {
         case LOGSEV_ALL:
-            fprintf(stderr, "ALL: ");
+            fprintf(logfile, "ALL: ");
             break;
         case LOGSEV_DEBUG:
-            fprintf(stderr, "DEBUG: ");
+            fprintf(logfile, "DEBUG: ");
             break;
         case LOGSEV_INFO:
-            fprintf(stderr, "INFO: ");
+            fprintf(logfile, "INFO: ");
             break;
         case LOGSEV_WARNING:
-            fprintf(stderr, "WARNING: ");
+            fprintf(logfile, "WARNING: ");
             break;
         case LOGSEV_ERROR:
-            fprintf(stderr, "ERROR: ");
+            fprintf(logfile, "ERROR: ");
             break;
         case LOGSEV_CRITICAL:
-            fprintf(stderr, "CRITICAL: ");
+            fprintf(logfile, "CRITICAL: ");
             break;
         default:
-            fprintf(stderr, "LOG: ");
+            fprintf(logfile, "LOG: ");
             break;
         }
-        vfprintf(stderr, fmt, argp);
-        fprintf(stderr, "\n");
+        vfprintf(logfile, fmt, argp);
+        fprintf(logfile, "\n");
         break;
     default:
         fprintf(stderr, "Unsupported logger type: %d\n", loggertype);
