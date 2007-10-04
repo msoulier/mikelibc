@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -DLINUX
 OBJS=mikelib.o debug.o logger.o
 
 all: libmike.a
