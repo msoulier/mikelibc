@@ -11,7 +11,7 @@ main(void)
     setloggertype(LOGGER_STDOUT, NULL);
     setloggersev(LOGSEV_INFO);
 
-    for (i = 0; i < 3; ++i)
+    for (i = 0; i < 4; ++i)
     {
         setloggertime(i);
         logmsg(LOGSEV_INFO, "Testing level %d timestamps on logs", i);
@@ -19,7 +19,7 @@ main(void)
 
     setloggertype(LOGGER_FILE, "./mylogfile");
 
-    for (i = 0; i < 3; ++i)
+    for (i = 0; i < 4; ++i)
     {
         setloggertime(i);
         logmsg(LOGSEV_INFO, "Testing level %d timestamps on logs", i);
