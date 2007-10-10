@@ -1,5 +1,11 @@
 #include <time.h>
+
+#ifdef LINUX
 #include <sys/time.h>
+#elif WIN32
+#include <windows.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 
@@ -16,9 +22,6 @@ FILE *logfile = NULL;
 
 void setloggertime(int level)
 {
-    /* Right now, valid levels are 0 and 1. */
-    if ((level != 0) && (level != 1) && (level != 2))
-        return;
     timestamplevel = level;
 }
 
@@ -64,15 +67,25 @@ void setloggersev(int severity)
 void vlogmsg(int severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
-    time_t result;
+#ifdef LINUX
     struct timeval tv;
     char *tf0 = "";
     char *tf1 = "%a %b %e %H:%M:%S";
     char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
     char *tf;
+#elif WIN32
+	SYSTEMTIME systemtime;
+    char *day_of_the_week[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    char *month_name[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        };
+#endif
 
+#ifdef LINUX
     switch (timestamplevel) {
     case LOGTIME_LOCNOZONE:
+    case LOGTIME_UTC:
         tf = tf1;
         break;
     case LOGTIME_LOCWZONE:
@@ -83,12 +96,40 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
         tf = tf0;
         break;
     }
+#endif
 
-    result = time(NULL);
-    gettimeofday(&tv, NULL);
-    strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
-    // "%a %b %e %H:%M:%S.%%li %Z (UTC%z) %Y",
-    // sprintf(timebuf, timebuf, tv.tv_usec);
+    if (timestamplevel)
+    {
+#ifdef LINUX
+        gettimeofday(&tv, NULL);
+        if (timestamplevel == LOGTIME_UTC)
+        {
+            strftime(timebuf, TIMEBUF, tf, gmtime(&tv.tv_sec));
+        }
+        else
+        {
+            strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
+        }
+#elif WIN32
+        // Lets try to get basic timestamps working on windows before using anything fancy.
+        if (timestamplevel == LOGTIME_UTC)
+        {
+            GetSystemTime(&systemtime);
+            sprintf(timebuf, "%s %s %d %02d:%02d:%02d", 
+                day_of_the_week[systemtime.wDayOfWeek],
+                month_name[systemtime.wMonth-1],
+                systemtime.wDay, 
+                systemtime.wHour,
+                systemtime.wMinute,
+                systemtime.wSecond);
+        }
+        else
+        {
+            fprintf(logfile, "Warning: Localtime not yet implemented on win32.\n");
+            timebuf[0] = '\0';
+        }
+#endif
+    }
 
     if (severity < loggerseverity)
         return;
@@ -97,13 +138,15 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
     case LOGGER_NONE:
         return;
     case LOGGER_SYSLOG:
-        fprintf(stderr, "Warning: syslog support not implemented.\n");
+        fprintf(logfile, "Warning: syslog support not implemented.\n");
         /* fall through for now */
     case LOGGER_STDOUT:
     case LOGGER_FILE:
         // FIXME - use hires timer and provide milliseconds?
         if (timestamplevel)
             fprintf(logfile, "%s ", timebuf);
+        if (timestamplevel == LOGTIME_UTC)
+            fprintf(logfile, "UTC ");
         switch (severity) {
         case LOGSEV_ALL:
             fprintf(logfile, "ALL: ");

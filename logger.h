@@ -16,6 +16,7 @@
 #define LOGTIME_NONE      0
 #define LOGTIME_LOCNOZONE 1
 #define LOGTIME_LOCWZONE  2
+#define LOGTIME_UTC       3
 
 #define TIMEBUF 128
 
@@ -42,5 +43,6 @@ void logmsg(int severity, const char *fmt, ...);
  * LOGTIME_NONE      - no timestamps
  * LOGTIME_LOCNOZONE - standard timestamps in localtime without zone
  * LOGTIME_LOCWZONE  - standard timestamps in localtime with timezone
+ * LOGTIME_UTC       - standard timestamps in UTC
  */
 void setloggertime(int level);
