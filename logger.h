@@ -17,6 +17,7 @@
 #define LOGTIME_LOCNOZONE 1
 #define LOGTIME_LOCWZONE  2
 #define LOGTIME_UTC       3
+#define LOGTIME_TAI64N    4
 
 #define TIMEBUF 128
 
@@ -44,5 +45,12 @@ void logmsg(int severity, const char *fmt, ...);
  * LOGTIME_LOCNOZONE - standard timestamps in localtime without zone
  * LOGTIME_LOCWZONE  - standard timestamps in localtime with timezone
  * LOGTIME_UTC       - standard timestamps in UTC
+ * LOGTIME_TAI64N    - timestamps in tai64n external format
+ *                     (http://cr.yp.to/libtai/tai64.html)
  */
 void setloggertime(int level);
+/* Note, the tai64n handling will only handle leapseconds if you put
+ * a leapsecs.dat file for it at /etc/leapsecs.dat. See libtai for full
+ * details (http://cr.yp.to/libtai.html).
+ * Note that this library makes use of libtai, which is in the public domain.
+ */

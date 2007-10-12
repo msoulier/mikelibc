@@ -1,8 +1,12 @@
+LIBTAIV=0.60
 CC=gcc
-CFLAGS=-Wall -DLINUX
+CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
 OBJS=mikelib.o debug.o logger.o
 
-all: libmike.a
+all: libtai.a libmike.a
+
+libtai.a:
+	(cd libtai-0.60 && make libtai.a)
 
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
@@ -23,3 +27,4 @@ test: all
 clean:
 	rm -f libmike.a $(OBJS)
 	(cd t && make clean)
+	(cd libtai-$(LIBTAIV) && rm -f *.o libtai.a)

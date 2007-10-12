@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -I..
 OBJS=test_logger.o test_mikelib.o
-LIBS=-L.. -lmike
+LIBS=-L.. -lmike -L../libtai-0.60 -ltai
 TESTS=test_logger test_mikelib
 
 all: $(TESTS) runtests

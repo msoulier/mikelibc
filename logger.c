@@ -2,6 +2,8 @@
 
 #ifdef LINUX
 #include <sys/time.h>
+#include "taia.h"
+#include "leapsecs.h"
 #elif WIN32
 #include <windows.h>
 #endif
@@ -11,6 +13,8 @@
 
 #include "logger.h"
 
+#define TAIN_SIZE 12
+
 /* The type of logger, defaulting to stdout. */
 int loggertype = LOGGER_STDOUT;
 /* The current log severity level. */
@@ -19,6 +23,25 @@ int loggerseverity = LOGSEV_INFO;
 int timestamplevel = 1;
 /* The FILE pointer of the logfile. */
 FILE *logfile = NULL;
+
+void
+taia2ext(char *timebuf, struct taia *tnow)
+{
+    char packed[TAIA_PACK];
+    char temp[2];
+    int i;
+
+    timebuf[0] = '@';
+    timebuf++;
+    taia_pack(packed, tnow);
+    for (i = 0; i < TAIN_SIZE; ++i)
+    {
+        sprintf(temp, "%2.2x", (unsigned char)packed[i]);
+        *timebuf++ = temp[0];
+        *timebuf++ = temp[1];
+    }
+    *timebuf = '\0';
+}
 
 void setloggertime(int level)
 {
@@ -68,13 +91,14 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
 #ifdef LINUX
+    struct taia tnow;
     struct timeval tv;
     char *tf0 = "";
     char *tf1 = "%a %b %e %H:%M:%S";
     char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
     char *tf;
 #elif WIN32
-	SYSTEMTIME systemtime;
+    SYSTEMTIME systemtime;
     char *day_of_the_week[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
     char *month_name[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -106,6 +130,12 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
         {
             strftime(timebuf, TIMEBUF, tf, gmtime(&tv.tv_sec));
         }
+        else if (timestamplevel == LOGTIME_TAI64N)
+        {
+            leapsecs_init();
+            taia_now(&tnow);
+            taia2ext(timebuf, &tnow);
+        }
         else
         {
             strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
@@ -125,7 +155,7 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
         }
         else
         {
-            fprintf(logfile, "Warning: Localtime not yet implemented on win32.\n");
+            fprintf(logfile, "Warning: Only UTC time implemented on win32.\n");
             timebuf[0] = '\0';
         }
 #endif
