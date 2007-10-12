@@ -29,6 +29,7 @@ main(void)
 
     sprintf(buffer, "cat %s", "./mylogfile");
     printf("\nOutput of file log is:\n");
+    fflush(stdout);
     system(buffer);
 
     exit(0);

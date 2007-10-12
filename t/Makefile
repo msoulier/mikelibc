@@ -16,5 +16,8 @@ test_mikelib: test_mikelib.c
 test_logger: test_logger.c
 	$(CC) $(CFLAGS) -o test_logger test_logger.c $(LIBS)
 
+trylog: trylog.c
+	$(CC) $(CFLAGS) -o trylog trylog.c $(LIBS)
+
 clean:
-	rm -f $(OBJS) $(TESTS)
+	rm -f $(OBJS) $(TESTS) trylog mylogfile
