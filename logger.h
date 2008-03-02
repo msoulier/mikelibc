@@ -37,6 +37,8 @@ int setloggertype(int type, char *path);
 void setloggersev(int severity);
 
 /* This function sends a message to the logger, with a given priority. 
+ * This function is thread-safe if built with the MIKELIBC_THREADS macro
+ * defined. The others are not, call them from the main thread.
  */
 void logmsg(int severity, const char *fmt, ...);
 

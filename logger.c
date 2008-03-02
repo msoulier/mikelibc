@@ -8,6 +8,10 @@
 #include <windows.h>
 #endif
 
+#ifdef MIKELIBC_THREADS
+#include <pthread.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 
@@ -23,6 +27,9 @@ int loggerseverity = LOGSEV_INFO;
 int timestamplevel = 1;
 /* The FILE pointer of the logfile. */
 FILE *logfile = NULL;
+#ifdef MIKELIBC_THREADS
+pthread_mutex_t logging_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 void
 taia2ext(char *timebuf, struct taia *tnow)
@@ -162,11 +169,11 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
     }
 
     if (severity < loggerseverity)
-        return;
+        goto CLEANUP_AND_RETURN;
 
     switch (loggertype) {
     case LOGGER_NONE:
-        return;
+        goto CLEANUP_AND_RETURN;
     case LOGGER_SYSLOG:
         fprintf(logfile, "Warning: syslog support not implemented.\n");
         /* fall through for now */
@@ -206,12 +213,26 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
     default:
         fprintf(stderr, "Unsupported logger type: %d\n", loggertype);
     }
+
+CLEANUP_AND_RETURN:
+    return;
 }
 
 void logmsg(int severity, const char *fmt, ...)
 {
     va_list argp;
+#ifdef MIKELIBC_THREADS
+
+#ifdef WIN32
+#error "No thread support on Win32 yet"
+#endif
+
+    pthread_mutex_lock(&logging_mutex);
+#endif
     va_start(argp, fmt);
     vlogmsg(severity, fmt, argp);
     va_end(argp);
+#ifdef MIKELIBC_THREADS
+    pthread_mutex_unlock(&logging_mutex);
+#endif
 }

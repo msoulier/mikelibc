@@ -2,6 +2,11 @@ LIBTAIV=0.60
 CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
 OBJS=mikelib.o debug.o logger.o
+LIBS=
+
+ifeq ($(threads),1)
+    CFLAGS += -DMIKELIBC_THREADS
+endif
 
 all: libtai.a libmike.a
 
