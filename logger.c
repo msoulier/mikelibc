@@ -50,6 +50,17 @@ taia2ext(char *timebuf, struct taia *tnow)
     *timebuf = '\0';
 }
 
+int
+gettimestamp(int format, char *timebuf)
+{
+    struct taia tnow;
+    if (format != FORMAT_TAI64N)
+        return -1;
+    taia_now(&tnow);
+    taia2ext(timebuf, &tnow);
+    return 1;
+}
+
 void setloggertime(int level)
 {
     timestamplevel = level;

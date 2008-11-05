@@ -19,6 +19,8 @@
 #define LOGTIME_UTC       3
 #define LOGTIME_TAI64N    4
 
+#define FORMAT_TAI64N     1
+
 #define TIMEBUF 128
 
 /* This function sets the type of the logger.
@@ -56,3 +58,16 @@ void setloggertime(int level);
  * details (http://cr.yp.to/libtai.html).
  * Note that this library makes use of libtai, which is in the public domain.
  */
+
+
+/* This function returns a timestamp for the current time, with the intention
+ * of providing multiple formats based on input.
+ *
+ * The type argument is equivalent to the levels in setloggertime. Currently
+ * the only supported type is FORMAT_TAI64N.
+ *
+ * The timebuf argument is a char* to a buffer to populate, that should be at
+ * least TIMEBUF in size.
+ */
+int
+gettimestamp(int format, char *timebuf);

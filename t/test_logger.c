@@ -27,10 +27,8 @@ main(void)
         logmsg(LOGSEV_INFO, "Testing level %d timestamps on logs", i);
     }
 
-    sprintf(buffer, "cat %s", "./mylogfile");
-    printf("\nOutput of file log is:\n");
-    fflush(stdout);
-    system(buffer);
+    gettimestamp(FORMAT_TAI64N, buffer);
+    printf("\nCurrent tai64n timestamp is %s\n", buffer);
 
     exit(0);
 }
