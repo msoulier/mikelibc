@@ -1,8 +1,8 @@
 #ifndef MIKELIB_H
 #define MIKELIB_H
 
-#include "debug.h"
-#include "logger.h"
+#include "mdebug.h"
+#include "mlogger.h"
 
 /*
  * Return a stack allocated buffer containing a version string.

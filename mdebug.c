@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "mdebug.h"
 
 /* Ideas...
  * - Splitting a string by a char, default to whitespace.
@@ -10,7 +10,7 @@ void dbg_printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    fprintf(stderr, "DEBUG: ");
+    fprintf(stderr, "debug libinipy.c: ");
     vfprintf(stderr, fmt, args);
     va_end(args);
 }

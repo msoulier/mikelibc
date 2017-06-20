@@ -15,7 +15,7 @@ dbg_printf(const char *fmt, ...);
  * fprintf out stderr otherwise.
  */
 #ifdef DEBUG
-#define debug(args) dbg_printf args
+#define mdebugf(args) dbg_printf args
 #else
-#define debug(args)
+#define mdebugf(args)
 #endif
