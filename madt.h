@@ -4,7 +4,7 @@
 #include "mdebug.h"
 
 #define mlinked_list_add(start, new_node, current) {    \
-    mdebugf(("in mlinked_list_add macro\n"));           \
+    mdebugf(("in mlinked_list_add macro: %s:%d\n", __FILE__, __LINE__)); \
     if (start == NULL) {                                \
         start = new_node;                               \
         mdebugf(("start is NULL <- new_node\n"));       \
@@ -20,7 +20,7 @@
 }
 
 #define mlinked_list_find(start, current, check, handle) { \
-    mdebugf(("in mlinked_list_find macro\n"));          \
+    mdebugf(("in mlinked_list_find macro: %s:%d\n", __FILE__, __LINE__)); \
     if (start == NULL) {                                \
         current = NULL;                                 \
     }                                                   \
@@ -37,7 +37,7 @@
 }
 
 #define mlinked_list_remove(start, current, previous, freenode, check, handle) { \
-    mdebugf(("in mlinked_list_remove macro\n"));        \
+    mdebugf(("in mlinked_list_remove macro: %s:%d\n", __FILE__, __LINE__)); \
     if (start != NULL) {                                \
         current = start;                                \
         while (current != NULL) {                       \
@@ -61,4 +61,16 @@
         }                                               \
     }                                                   \
 }
+
+#define mlinked_list_length(start, length) {            \
+    mdebugf(("in mlinked_list_length macro: %s:%d\n", __FILE__, __LINE__)); \
+    length = 0;                                         \
+    if (start != NULL) {                                \
+        while (start != NULL) {                         \
+            length++;                                   \
+            start = start->next;                        \
+        }                                               \
+    }                                                   \
+}
+
 #endif

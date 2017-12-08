@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "mdebug.h"
 
 /* Ideas...
@@ -10,7 +13,7 @@ void dbg_printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    fprintf(stderr, "debug libinipy.c: ");
+    fprintf(stderr, "[%d] debug libinipy.c: ", getpid());
     vfprintf(stderr, fmt, args);
     va_end(args);
 }
