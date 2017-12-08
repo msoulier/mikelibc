@@ -62,14 +62,13 @@
     }                                                   \
 }
 
-#define mlinked_list_length(start, length) {            \
+#define mlinked_list_length(start, current, length) {   \
     mdebugf(("in mlinked_list_length macro: %s:%d\n", __FILE__, __LINE__)); \
     length = 0;                                         \
-    if (start != NULL) {                                \
-        while (start != NULL) {                         \
-            length++;                                   \
-            start = start->next;                        \
-        }                                               \
+    current = start;                                    \
+    while (current != NULL) {                           \
+        length++;                                       \
+        current = current->next;                        \
     }                                                   \
 }
 
