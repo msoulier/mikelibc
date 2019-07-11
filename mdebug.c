@@ -13,9 +13,12 @@
 
 void dbg_printf(const char *fmt, ...)
 {
+#ifdef PTHREADS
+    pthread_mutex_lock(&mdebug_mutex);
+#endif
     va_list args;
     va_start(args, fmt);
-#ifdef _PTHREADS_
+#ifdef PTHREADS
     pid_t tid;
     tid = syscall(SYS_gettid);
     fprintf(stderr, "[%d][%d] debug libinipy.c: ", getpid(), tid);
@@ -24,4 +27,7 @@ void dbg_printf(const char *fmt, ...)
 #endif
     vfprintf(stderr, fmt, args);
     va_end(args);
+#ifdef PTHREADS
+    pthread_mutex_unlock(&mdebug_mutex);
+#endif
 }

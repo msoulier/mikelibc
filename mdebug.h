@@ -1,5 +1,9 @@
 #include <stdarg.h>
 #include <stdio.h>
+#ifdef PTHREADS
+#include <pthread.h>
+static pthread_mutex_t mdebug_mutex;
+#endif
 
 /* A simple software assertion that does not terminate the executable.
  * 0 is good, 1 is bad.
