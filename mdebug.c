@@ -1,5 +1,7 @@
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/syscall.h>
 
 #include "mdebug.h"
 
@@ -13,7 +15,13 @@ void dbg_printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
+#ifdef _PTHREADS_
+    pid_t tid;
+    tid = syscall(SYS_gettid);
+    fprintf(stderr, "[%d][%d] debug libinipy.c: ", getpid(), tid);
+#else
     fprintf(stderr, "[%d] debug libinipy.c: ", getpid());
+#endif
     vfprintf(stderr, fmt, args);
     va_end(args);
 }
