@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "logger.h"
+#include "mlogger.h"
 
 #define LOGGER_TIMES 4
 

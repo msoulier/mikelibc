@@ -1,7 +1,7 @@
 LIBTAIV=0.60
 CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
-OBJS=mikelib.o mdebug.o mlogger.o
+OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o
 LIBS=
 
 ifeq ($(threads),1)
@@ -25,9 +25,14 @@ mdebug.o: mdebug.c mdebug.h
 mlogger.o: mlogger.c mlogger.h
 	$(CC) $(CFLAGS) -c mlogger.c
 
+mutil.o: mutil.c mutil.h
+	$(CC) $(CFLAGS) -c mutil.c
+
+madt.o: madt.c madt.h
+	$(CC) $(CFLAGS) -c madt.c
+
 test: all
 	(cd t && make clean && make)
-	./t/test_logger
 
 clean:
 	rm -f libmike.a $(OBJS)
