@@ -72,4 +72,16 @@
     }                                                   \
 }
 
+typedef struct mbtree_int_node {
+    int value;
+    struct mbtree_int_node *left;
+    struct mbtree_int_node *right;
+} mbtree_int_node_t;
+
+mbtree_int_node_t* new_mbtree_int_node(int value);
+
+void free_mbtree_int_node(mbtree_int_node_t *node);
+
+void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
+
 #endif
