@@ -1,7 +1,7 @@
 #include "mikelib.h"
 
-char mikelib_version_s[] = "1.0.4";
-int mikelib_version_i[] = { 1, 0, 4 };
+char mikelib_version_s[] = "1.0.5";
+int mikelib_version_i[] = { 1, 0, 5 };
 
 char *
 get_mikelib_version_s(void)
