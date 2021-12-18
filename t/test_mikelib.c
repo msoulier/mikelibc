@@ -9,6 +9,9 @@ main(void)
 
     printf("Version of mikelib is %s\n", get_mikelib_version_s());
 
+    printf("Next line should be from mdebugf\n");
+    mdebugf("Hello from mdebugf\n");
+
     printf("Testing version array:\n");
     ver = get_mikelib_version_i();
     printf("\tmajor    = %d\n", ver[0]);

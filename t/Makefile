@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -I..
+CFLAGS=-Wall -I.. -DDEBUG
 OBJS=test_logger.o test_mikelib.o test_adt.o
 LIBS=-L.. -lmike -L../libtai-0.60 -ltai
 TESTS=test_logger test_mikelib test_util test_adt

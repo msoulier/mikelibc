@@ -19,7 +19,7 @@ dbg_printf(const char *fmt, ...);
  * fprintf out stderr otherwise.
  */
 #ifdef DEBUG
-#define mdebugf(args) dbg_printf args
+#define mdebugf(...) dbg_printf (__VA_ARGS__)
 #else
 #define mdebugf(args)
 #endif

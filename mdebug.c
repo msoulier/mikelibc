@@ -21,9 +21,9 @@ void dbg_printf(const char *fmt, ...)
 #ifdef PTHREADS
     pid_t tid;
     tid = syscall(SYS_gettid);
-    fprintf(stderr, "[%d][%d] debug libinipy.c: ", getpid(), tid);
+    fprintf(stderr, "[%d][%d] mdebug: ", getpid(), tid);
 #else
-    fprintf(stderr, "[%d] debug libinipy.c: ", getpid());
+    fprintf(stderr, "[%d] mdebug: ", getpid());
 #endif
     vfprintf(stderr, fmt, args);
     va_end(args);
