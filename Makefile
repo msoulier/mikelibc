@@ -3,6 +3,11 @@ CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
 OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o
 LIBS=
+DEBUG=0
+
+ifeq ($(DEBUG),1)
+	CFLAGS += -ggdb -fsanitize=address
+endif
 
 ifeq ($(threads),1)
     CFLAGS += -DMIKELIBC_THREADS

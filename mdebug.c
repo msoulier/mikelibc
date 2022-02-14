@@ -1,7 +1,10 @@
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifdef PTHREADS
 #include <sys/syscall.h>
+#endif
 
 #include "mdebug.h"
 
