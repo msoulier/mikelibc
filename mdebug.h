@@ -15,10 +15,10 @@ void
 dbg_printf(const char *fmt, ...);
 
 /*
- * A debug macro that compiles out if DEBUG is not set, and compiles to an
+ * A debug macro that compiles out if MDEBUG is not set, and compiles to an
  * fprintf out stderr otherwise.
  */
-#ifdef DEBUG
+#ifdef MDEBUG
 #define mdebugf(...) dbg_printf (__VA_ARGS__)
 #else
 #define mdebugf(args)

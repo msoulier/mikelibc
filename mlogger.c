@@ -229,7 +229,7 @@ CLEANUP_AND_RETURN:
     return;
 }
 
-void logmsg(int severity, const char *fmt, ...)
+void logmsg(logseverity_t severity, const char *fmt, ...)
 {
     va_list argp;
 #ifdef MIKELIBC_THREADS

@@ -2,7 +2,7 @@
 
 #include "mlogger.h"
 
-#define LOGGER_TIMES 4
+#define LOGGER_TIMES 5
 
 int
 main(void)
@@ -11,12 +11,12 @@ main(void)
     char buffer[1024];
 
     setloggertype(LOGGER_STDOUT, NULL);
-    setloggersev(LOGSEV_INFO);
+    setloggersev(INFO);
 
     for (i = 0; i < LOGGER_TIMES+1; ++i)
     {
         setloggertime(i);
-        logmsg(LOGSEV_INFO, "Testing level %d timestamps on logs", i);
+        logmsg(INFO, "Testing level %d timestamps on logs", i);
     }
 
     setloggertype(LOGGER_FILE, "./mylogfile");
@@ -24,7 +24,7 @@ main(void)
     for (i = 0; i < LOGGER_TIMES+1; ++i)
     {
         setloggertime(i);
-        logmsg(LOGSEV_INFO, "Testing level %d timestamps on logs", i);
+        logmsg(INFO, "Testing level %d timestamps on logs", i);
     }
 
     gettimestamp(FORMAT_TAI64N, buffer);

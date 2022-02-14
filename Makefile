@@ -3,9 +3,9 @@ CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
 OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o
 LIBS=
-DEBUG=0
+MDEBUG=0
 
-ifeq ($(DEBUG),1)
+ifeq ($(MDEBUG),1)
 	CFLAGS += -ggdb -fsanitize=address
 endif
 

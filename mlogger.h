@@ -40,7 +40,7 @@ void setloggersev(logseverity_t severity);
  * This function is thread-safe if built with the MIKELIBC_THREADS macro
  * defined. The others are not, call them from the main thread.
  */
-void logmsg(int severity, const char *fmt, ...);
+void logmsg(logseverity_t severity, const char *fmt, ...);
 
 // Log timestamp type.
 typedef enum {
