@@ -22,9 +22,9 @@
 /* The type of logger, defaulting to stdout. */
 int loggertype = LOGGER_STDOUT;
 /* The current log severity level. */
-int loggerseverity = LOGSEV_INFO;
+logseverity_t loggerseverity = INFO;
 /* Whether to show timestamps. */
-int timestamplevel = 1;
+int timestamptype = LOCNOZONE;
 /* The FILE pointer of the logfile. */
 FILE *logfile = NULL;
 #ifdef MIKELIBC_THREADS
@@ -35,7 +35,7 @@ void
 taia2ext(char *timebuf, struct taia *tnow)
 {
     char packed[TAIA_PACK];
-    char temp[2];
+    char temp[5];
     int i;
 
     timebuf[0] = '@';
@@ -43,7 +43,7 @@ taia2ext(char *timebuf, struct taia *tnow)
     taia_pack(packed, tnow);
     for (i = 0; i < TAIN_SIZE; ++i)
     {
-        sprintf(temp, "%2.2x", (unsigned char)packed[i]);
+        snprintf(temp, 5, "%2.2x", (unsigned char)packed[i]);
         *timebuf++ = temp[0];
         *timebuf++ = temp[1];
     }
@@ -61,9 +61,9 @@ gettimestamp(int format, char *timebuf)
     return 1;
 }
 
-void setloggertime(int level)
+void setloggertime(logtime_t tstype)
 {
-    timestamplevel = level;
+    timestamptype = tstype;
 }
 
 int setloggertype(int type, char* path)
@@ -100,12 +100,12 @@ int setloggertype(int type, char* path)
     return 1;
 }
 
-void setloggersev(int severity)
+void setloggersev(logseverity_t severity)
 {
     loggerseverity = severity;
 }
 
-void vlogmsg(int severity, const char *fmt, va_list argp)
+void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
 #ifdef LINUX
@@ -125,30 +125,30 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
 #endif
 
 #ifdef LINUX
-    switch (timestamplevel) {
-    case LOGTIME_LOCNOZONE:
-    case LOGTIME_UTC:
+    switch (timestamptype) {
+    case LOCNOZONE:
+    case UTC:
         tf = tf1;
         break;
-    case LOGTIME_LOCWZONE:
+    case LOCWZONE:
         tf = tf2;
         break;
     default:
-        /* LOGTIME_NONE */
+        /* NONE */
         tf = tf0;
         break;
     }
 #endif
 
-    if (timestamplevel)
+    if (timestamptype)
     {
 #ifdef LINUX
         gettimeofday(&tv, NULL);
-        if (timestamplevel == LOGTIME_UTC)
+        if (timestamptype == UTC)
         {
             strftime(timebuf, TIMEBUF, tf, gmtime(&tv.tv_sec));
         }
-        else if (timestamplevel == LOGTIME_TAI64N)
+        else if (timestamptype == TAI64N)
         {
             leapsecs_init();
             taia_now(&tnow);
@@ -160,7 +160,7 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
         }
 #elif WIN32
         // Lets try to get basic timestamps working on windows before using anything fancy.
-        if (timestamplevel == LOGTIME_UTC)
+        if (timestamptype == UTC)
         {
             GetSystemTime(&systemtime);
             sprintf(timebuf, "%s %s %d %02d:%02d:%02d", 
@@ -191,27 +191,27 @@ void vlogmsg(int severity, const char *fmt, va_list argp)
     case LOGGER_STDOUT:
     case LOGGER_FILE:
         // FIXME - use hires timer and provide milliseconds?
-        if (timestamplevel)
+        if (timestamptype)
             fprintf(logfile, "%s ", timebuf);
-        if (timestamplevel == LOGTIME_UTC)
+        if (timestamptype == UTC)
             fprintf(logfile, "UTC ");
         switch (severity) {
-        case LOGSEV_ALL:
+        case ALL:
             fprintf(logfile, "ALL: ");
             break;
-        case LOGSEV_DEBUG:
+        case DEBUG:
             fprintf(logfile, "DEBUG: ");
             break;
-        case LOGSEV_INFO:
+        case INFO:
             fprintf(logfile, "INFO: ");
             break;
-        case LOGSEV_WARNING:
+        case WARNING:
             fprintf(logfile, "WARNING: ");
             break;
-        case LOGSEV_ERROR:
+        case ERROR:
             fprintf(logfile, "ERROR: ");
             break;
-        case LOGSEV_CRITICAL:
+        case CRITICAL:
             fprintf(logfile, "CRITICAL: ");
             break;
         default:

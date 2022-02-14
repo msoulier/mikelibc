@@ -1,23 +1,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+// This needs to go away in favour of a proper logger handler system.
 #define LOGGER_NONE     -1
 #define LOGGER_STDOUT    0
 #define LOGGER_SYSLOG    1
 #define LOGGER_FILE      2
-
-#define LOGSEV_ALL       0
-#define LOGSEV_DEBUG    10
-#define LOGSEV_INFO     20
-#define LOGSEV_WARNING  30
-#define LOGSEV_ERROR    40
-#define LOGSEV_CRITICAL 50
-
-#define LOGTIME_NONE      0
-#define LOGTIME_LOCNOZONE 1
-#define LOGTIME_LOCWZONE  2
-#define LOGTIME_UTC       3
-#define LOGTIME_TAI64N    4
 
 #define FORMAT_TAI64N     1
 
@@ -35,8 +23,18 @@
  */
 int setloggertype(int type, char *path);
 
+// Log severity levels
+typedef enum {
+    ALL         = 0,
+    DEBUG       = 10,
+    INFO        = 20,
+    WARNING     = 30,
+    ERROR       = 40,
+    CRITICAL    = 50
+} logseverity_t;
+
 /* This function sets the current severity of the logger. */
-void setloggersev(int severity);
+void setloggersev(logseverity_t severity);
 
 /* This function sends a message to the logger, with a given priority. 
  * This function is thread-safe if built with the MIKELIBC_THREADS macro
@@ -44,15 +42,24 @@ void setloggersev(int severity);
  */
 void logmsg(int severity, const char *fmt, ...);
 
+// Log timestamp type.
+typedef enum {
+    NONE        = 0,
+    LOCNOZONE   = 1,
+    LOCWZONE    = 2,
+    UTC         = 3,
+    TAI64N      = 4
+} logtime_t;
+
 /* This function sets the level of the timestamps used by the logger.
- * LOGTIME_NONE      - no timestamps
- * LOGTIME_LOCNOZONE - standard timestamps in localtime without zone
- * LOGTIME_LOCWZONE  - standard timestamps in localtime with timezone
- * LOGTIME_UTC       - standard timestamps in UTC
- * LOGTIME_TAI64N    - timestamps in tai64n external format
+ * NONE      - no timestamps
+ * LOCNOZONE - standard timestamps in localtime without zone
+ * LOCWZONE  - standard timestamps in localtime with timezone
+ * UTC       - standard timestamps in UTC
+ * TAI64N    - timestamps in tai64n external format
  *                     (http://cr.yp.to/libtai/tai64.html)
  */
-void setloggertime(int level);
+void setloggertime(logtime_t tstype);
 /* Note, the tai64n handling will only handle leapseconds if you put
  * a leapsecs.dat file for it at /etc/leapsecs.dat. See libtai for full
  * details (http://cr.yp.to/libtai.html).
