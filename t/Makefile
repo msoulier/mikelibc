@@ -1,31 +1,15 @@
 CC=gcc
 CFLAGS=-Wall -I.. -DMDEBUG
-OBJS=test_logger.o test_mikelib.o test_adt.o
-LIBS=-L.. -lmike -L../libtai-0.60 -ltai
-TESTS=test_logger test_mikelib test_util test_adt
+LIBS=-L.. -lmike -L../libtai-0.60 -ltai -lcunit
+TESTS=
 
-all: $(TESTS) runtests
+all: unittest
 
-runtests:
-	-./test_mikelib
-	-./test_logger
-	-./test_util
-	-./test_adt
+run:
+	./unittest
 
-test_util: test_util.c ../mutil.h ../libmike.a
-	$(CC) $(CFLAGS) -o test_util test_util.c $(LIBS)
-
-test_mikelib: test_mikelib.c ../libmike.a
-	$(CC) $(CFLAGS) -o test_mikelib test_mikelib.c $(LIBS)
-
-test_logger: test_logger.c ../mlogger.h ../libmike.a
-	$(CC) $(CFLAGS) -o test_logger test_logger.c $(LIBS)
-
-test_adt: test_adt.c ../madt.h ../libmike.a
-	$(CC) $(CFLAGS) -o test_adt test_adt.c $(LIBS)
-
-trylog: trylog.c ../libmike.a
-	$(CC) $(CFLAGS) -o trylog trylog.c $(LIBS)
+unittest: test.o
+	$(CC) $(CFLAGS) -o unittest test.o $(LIBS)
 
 clean:
-	rm -f $(OBJS) $(TESTS) trylog mylogfile
+	rm -f unittest *.o

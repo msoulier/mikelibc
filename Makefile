@@ -37,7 +37,7 @@ madt.o: madt.c madt.h
 	$(CC) $(CFLAGS) -c madt.c
 
 test: all
-	(cd t && make clean && make)
+	(cd t && make clean && make && make run)
 
 clean:
 	rm -f libmike.a $(OBJS)
