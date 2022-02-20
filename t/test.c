@@ -22,11 +22,16 @@ int clean_suite1(void)
 }
 
 void test_sfib(void) {
-    CU_ASSERT( sfibonacci(1) == 0 );
-    CU_ASSERT( sfibonacci(0) == 1 );
-    CU_ASSERT( sfibonacci(0) == 1 );
-    CU_ASSERT( sfibonacci(0) == 2 );
-    CU_ASSERT( sfibonacci(0) == 3 );
+    uint64_t first = sfibonacci(1);
+    uint64_t second = sfibonacci(0);
+    uint64_t third = sfibonacci(0);
+    uint64_t fourth = sfibonacci(0);
+    uint64_t fifth = sfibonacci(0);
+    CU_ASSERT( first  == 0 );
+    CU_ASSERT( second == 1 );
+    CU_ASSERT( third  == 1 );
+    CU_ASSERT( fourth == 2 );
+    CU_ASSERT( fifth  == 3 );
 }
 
 void test_fib(void) {

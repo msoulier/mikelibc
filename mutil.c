@@ -2,7 +2,7 @@
 
 #include "mutil.h"
 
-long long int fibonacci(int n) {
+uint64_t fibonacci(int n) {
     if (n < 1) {
         return 0;
     } else if (n == 1) {
@@ -12,18 +12,24 @@ long long int fibonacci(int n) {
     }
 }
 
-long long int sfibonacci(int initialize) {
-    static long long int first = 0;
-    static long long int second = 1;
-    if (initialize) {
+uint64_t sfibonacci(int reset) {
+    static uint64_t first = 0;
+    static uint64_t second = 1;
+    static uint64_t count = 0;
+    if (reset) {
         first = 0;
         second = 1;
+        count = 0;
     }
-    long long int out = first + second;
-    if (first == 0) {
-        out = 0;
+    count++;
+    if (count == 1) {
+        return 0;
+    } else if (count == 2) {
+        return 1;
+    } else {
+        uint64_t out = first + second;
+        first = second;
+        second = out;
+        return out;
     }
-    first = second;
-    second = out;
-    return out;
 }

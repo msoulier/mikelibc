@@ -1,3 +1,5 @@
-long long int fibonacci(int n);
+#include <stdint.h>
 
-long long int sfibonacci(int initialize);
+uint64_t fibonacci(int n);
+
+uint64_t sfibonacci(int reset);
