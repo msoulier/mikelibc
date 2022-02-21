@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "mutil.h"
+#include "madt.h"
 #include "CUnit/Basic.h"
+
+typedef struct mll_node {
+    int value;
+    struct mll_node *next;
+} mll_node_t;
 
 /* The suite initialization function.
  * Opens the temporary file used by the tests.
@@ -21,6 +27,56 @@ int clean_suite1(void)
     return 0;
 }
 
+/*
+ * Test the mlinked-list macros.
+ */
+void test_mlinked_list(void) {
+    mll_node_t *start = NULL;
+    mll_node_t *current = NULL;
+    mll_node_t *freenode = NULL;
+    mll_node_t *previous = NULL;
+    int length;
+
+    mll_node_t one = { 1, NULL };
+    mll_node_t two = { 2, NULL };
+    mll_node_t three = { 3, NULL };
+
+    mlinked_list_add(start, &one, current);
+    mlinked_list_add(start, &two, current);
+    mlinked_list_add(start, &three, current);
+
+    mlinked_list_length(start, current, length);
+    CU_ASSERT( length == 3 );
+
+    int check(int handle, mll_node_t *current) {
+        if (current->value == handle) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    mlinked_list_find(start, current, check, 2);
+
+    CU_ASSERT( current->value == 2 );
+
+    mlinked_list_find(start, current, check, 3);
+
+    CU_ASSERT( current->value == 3 );
+    CU_ASSERT( current->next == NULL );
+
+    mlinked_list_remove(start, current, previous, freenode, check, 2);
+
+    CU_ASSERT( freenode->value == 2 );
+
+    mlinked_list_length(start, current, length);
+
+    CU_ASSERT( length == 2 );
+}
+
+/*
+ * Test the sfibonacci function.
+ */
 void test_sfib(void) {
     uint64_t first = sfibonacci(1);
     uint64_t second = sfibonacci(0);
@@ -34,6 +90,9 @@ void test_sfib(void) {
     CU_ASSERT( fifth  == 3 );
 }
 
+/*
+ * Test the fibonacci function.
+ */
 void test_fib(void) {
     CU_ASSERT( fibonacci(0) == 0 );
     CU_ASSERT( fibonacci(1) == 1 );
@@ -63,7 +122,9 @@ int main()
 
    /* add the tests to the suite */
    if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
-        (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) )
+        (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
+        (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list))
+      )
    {
       CU_cleanup_registry();
       return CU_get_error();

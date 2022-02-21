@@ -6,7 +6,7 @@ TESTS=
 all: unittest
 
 run:
-	./unittest
+	./unittest 2>stderr.log
 
 unittest: test.o
 	$(CC) $(CFLAGS) -o unittest test.o $(LIBS)
