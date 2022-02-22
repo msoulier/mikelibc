@@ -5,6 +5,8 @@ OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o
 LIBS=
 MDEBUG=0
 
+.PHONY: clean test
+
 ifeq ($(MDEBUG),1)
 	CFLAGS += -ggdb -fsanitize=address
 endif

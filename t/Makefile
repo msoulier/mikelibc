@@ -3,13 +3,15 @@ CFLAGS=-Wall -I.. -DMDEBUG
 LIBS=-L.. -lmike -L../libtai-0.60 -ltai -lcunit
 TESTS=
 
-all: unittest
+.PHONY: clean test
+
+all: test
 
 run:
-	./unittest 2>stderr.log
+	./test 2>stderr.log
 
-unittest: test.o
-	$(CC) $(CFLAGS) -o unittest test.o $(LIBS)
+test: test.o
+	$(CC) $(CFLAGS) -o test test.o $(LIBS)
 
 clean:
-	rm -f unittest *.o
+	rm -f test *.o *.log
