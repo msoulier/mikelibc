@@ -1,3 +1,6 @@
+#ifndef MDEBUG_H
+#define MDEBUG_H
+
 #include <stdarg.h>
 #include <stdio.h>
 #ifdef PTHREADS
@@ -22,4 +25,6 @@ dbg_printf(const char *fmt, ...);
 #define mdebugf(...) dbg_printf (__VA_ARGS__)
 #else
 #define mdebugf(args)
+#endif
+
 #endif

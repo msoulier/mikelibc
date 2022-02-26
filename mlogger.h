@@ -1,3 +1,6 @@
+#ifndef MLOGGER_H
+#define MLOGGER_H
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -78,3 +81,5 @@ void setloggertime(logtime_t tstype);
  */
 int
 gettimestamp(int format, char *timebuf);
+
+#endif

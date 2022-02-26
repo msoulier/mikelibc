@@ -2,6 +2,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 extern int errno;
 #include "tai.h"
 #include "leapsecs.h"

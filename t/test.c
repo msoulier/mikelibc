@@ -2,6 +2,7 @@
 #include <string.h>
 #include "mutil.h"
 #include "madt.h"
+#include "mnet.h"
 #include "CUnit/Basic.h"
 
 typedef struct mll_node {
@@ -101,6 +102,18 @@ void test_fib(void) {
     CU_ASSERT( fibonacci(4) == 3 );
 }
 
+/*
+ * Test the dns functions.
+ */
+void test_dns(void) {
+    int rv = maddrlookup_tcp("google.com", "80");
+    CU_ASSERT( rv == 0 );
+    rv = maddrlookup_tcp("www.cbc.ca", "80");
+    CU_ASSERT( rv == 0 );
+    rv = maddrlookup_tcp("does.not.exist.foo", "22");
+    CU_ASSERT( rv != 0 );
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -123,7 +136,8 @@ int main()
    /* add the tests to the suite */
    if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
         (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
-        (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list))
+        (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
+        (NULL == CU_add_test(pSuite, "test of dns functions", test_dns))
       )
    {
       CU_cleanup_registry();

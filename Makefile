@@ -1,14 +1,15 @@
 LIBTAIV=0.60
+#CC=c99
 CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
-OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o
+OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o mnet.o
 LIBS=
-MDEBUG=0
+MDEBUG=1
 
 .PHONY: clean test
 
 ifeq ($(MDEBUG),1)
-	CFLAGS += -ggdb -fsanitize=address
+	CFLAGS += -ggdb -fsanitize=address -DMDEBUG
 endif
 
 ifeq ($(threads),1)
@@ -37,6 +38,9 @@ mutil.o: mutil.c mutil.h
 
 madt.o: madt.c madt.h
 	$(CC) $(CFLAGS) -c madt.c
+
+mnet.o: mnet.c mnet.h
+	$(CC) $(CFLAGS) -c mnet.c
 
 test: all
 	(cd t && make clean && make && make run)
