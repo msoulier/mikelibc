@@ -24,7 +24,7 @@ dbg_printf(const char *fmt, ...);
 #ifdef MDEBUG
 #define mdebugf(...) dbg_printf (__VA_ARGS__)
 #else
-#define mdebugf(args)
+#define mdebugf(...)
 #endif
 
 #endif

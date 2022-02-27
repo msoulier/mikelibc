@@ -7,7 +7,7 @@ MDEBUG=0
 .PHONY: clean test
 
 ifeq ($(MDEBUG),1)
-    CFLAGS += -ggdb -DMDEBUG
+    CFLAGS += -ggdb -DMDEBUG -fsanitize=address
 endif
 
 ifeq ($(threads),1)

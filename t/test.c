@@ -6,6 +6,7 @@
 #include "mutil.h"
 #include "madt.h"
 #include "mnet.h"
+#include "mdebug.h"
 #include "CUnit/Basic.h"
 
 typedef struct mll_node {
@@ -109,13 +110,13 @@ void test_fib(void) {
  * Test the dns functions.
  */
 void test_dns(void) {
-    int rv = maddrlookup_tcp("google.com", "80");
+    int rv = maddrlookup("google.com", "80", TCP);
     CU_ASSERT( rv == 0 );
-    rv = maddrlookup_tcp("www.cbc.ca", "80");
+    rv = maddrlookup("www.cbc.ca", "80", TCP);
     CU_ASSERT( rv == 0 );
-    rv = maddrlookup_tcp("does.not.exist.foo", "22");
+    rv = maddrlookup("does.not.exist.foo", "22", TCP);
     CU_ASSERT( rv == EAI_NONAME )
-    rv = maddrlookup_tcp("amazon.com", NULL);
+    rv = maddrlookup("amazon.com", NULL, TCP);
     CU_ASSERT( rv == 0 );
 }
 

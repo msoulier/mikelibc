@@ -36,28 +36,37 @@ void paddr_error(int err) {
     }
 }
 
-int maddrlookup_tcp(const char *host, const char *service) {
+int maddrlookup(const char *host, const char *service, mSockType socktype) {
+    int rv;
     struct addrinfo *infop = NULL;
+    struct addrinfo *current = NULL;
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET; // AF_UNSPEC for v4 or v6
-    hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    if (socktype == TCP) {
+        hints.ai_socktype = SOCK_STREAM;
+    } else if (socktype == UDP) {
+        hints.ai_socktype = SOCK_DGRAM;
+    }
 
-    mdebugf("maddrlookup_tcp: host %s, service %s\n", host, service);
+    mdebugf("maddrlookup: host %s, service %s\n", host, service);
 
-    int rv;
     if ((rv = getaddrinfo(host, service, &hints, &infop)) != 0) {
         paddr_error(rv);
-        return rv;
+        goto CLEANUP;
     }
     mdebugf("getaddrinfo rv was %d\n", rv);
-    for ( ; infop != NULL; infop = infop->ai_next) {
-        struct sockaddr_in *sa = (struct sockaddr_in *)infop->ai_addr;
+    for (current = infop; current != NULL; current = current->ai_next) {
+        struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
         printf("\n%s port: %d protocol: %d\n",
            inet_ntoa(sa->sin_addr),
            ntohs(sa->sin_port),
-           infop->ai_protocol);
+           current->ai_protocol);
     }
-    return 0;
+CLEANUP:
+    mdebugf("CLEANUP: calling freeaddrinfo\n");
+    if (infop != NULL)
+        freeaddrinfo(infop);
+    return rv;
 }
