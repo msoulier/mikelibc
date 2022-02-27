@@ -1,12 +1,15 @@
 #define _GNU_SOURCE
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 
-#ifdef PTHREADS
+#ifdef MIKELIBC_THREADS
 #include <sys/syscall.h>
 #endif
 
 #include "mdebug.h"
+
+#define TSTAMP_SIZE 1024
 
 /* Ideas...
  * - Splitting a string by a char, default to whitespace.
@@ -16,21 +19,27 @@
 
 void dbg_printf(const char *fmt, ...)
 {
-#ifdef PTHREADS
+#ifdef MIKELIBC_THREADS
     pthread_mutex_lock(&mdebug_mutex);
 #endif
     va_list args;
     va_start(args, fmt);
-#ifdef PTHREADS
+    time_t now = time(NULL);
+    struct tm *nowtm = localtime(&now);
+    char ts[TSTAMP_SIZE];
+    strftime(ts, TSTAMP_SIZE, "%c", nowtm);
+#ifdef MIKELIBC_THREADS
     pid_t tid;
     tid = syscall(SYS_gettid);
-    fprintf(stderr, "[%d][%d] mdebug: ", getpid(), tid);
+    //fprintf(stderr, "[%d][%d] [DEBUG]: ", getpid(), tid);
+    fprintf(stderr, "%s [%d] [DEBUG]: ", ts, tid);
 #else
-    fprintf(stderr, "[%d] mdebug: ", getpid());
+    //fprintf(stderr, "[%d] [DEBUG]: ", getpid());
+    fprintf(stderr, "%s [DEBUG]: ", ts);
 #endif
     vfprintf(stderr, fmt, args);
     va_end(args);
-#ifdef PTHREADS
+#ifdef MIKELIBC_THREADS
     pthread_mutex_unlock(&mdebug_mutex);
 #endif
 }

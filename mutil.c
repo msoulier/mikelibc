@@ -1,8 +1,10 @@
 #include <stdio.h>
 
 #include "mutil.h"
+#include "mdebug.h"
 
 uint64_t fibonacci(int n) {
+    mdebugf("fibonacci: n = %d\n", n);
     if (n < 1) {
         return 0;
     } else if (n == 1) {

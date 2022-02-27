@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include "mutil.h"
 #include "madt.h"
 #include "mnet.h"
@@ -111,7 +114,9 @@ void test_dns(void) {
     rv = maddrlookup_tcp("www.cbc.ca", "80");
     CU_ASSERT( rv == 0 );
     rv = maddrlookup_tcp("does.not.exist.foo", "22");
-    CU_ASSERT( rv != 0 );
+    CU_ASSERT( rv == EAI_NONAME )
+    rv = maddrlookup_tcp("amazon.com", NULL);
+    CU_ASSERT( rv == 0 );
 }
 
 /* The main() function for setting up and running the tests.
