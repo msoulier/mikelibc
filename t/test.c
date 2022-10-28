@@ -131,6 +131,29 @@ void test_dns(void) {
     CU_ASSERT( rv == 0 );
 }
 
+/*
+ * Test popenRWE
+ */
+void test_popenRWE(void) {
+    int fds[3] = { 0, 0, 0 };
+    const char * const args[2] = { "/bin", "/usr/bin" };
+    int rv = popenRWE(fds, "/bin/ls", args);
+    printf("rv was %d\n", rv);
+    char buffer[1024];
+    FILE *out = fdopen(fds[1], "r");
+    if (out == NULL) {
+        perror("fdopen");
+        return;
+    }
+    for (;;) {
+        if (fgets(buffer, 1024, out) == NULL) {
+            break;
+        } else {
+            printf(buffer);
+        }
+    }
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -155,7 +178,8 @@ int main()
         (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
         (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
         (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
-        (NULL == CU_add_test(pSuite, "test of dns functions", test_dns))
+        (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
+        (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE))
       )
    {
       CU_cleanup_registry();
