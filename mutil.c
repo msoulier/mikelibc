@@ -1,7 +1,17 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "mutil.h"
 #include "mdebug.h"
+
+time_t now;
+struct tm now_tm;
+
+int dstnow() {
+    time(&now);
+    localtime_r(&now, &now_tm);
+    return now_tm.tm_isdst;
+}
 
 uint64_t fibonacci(int n) {
     mdebugf("fibonacci: n = %d\n", n);

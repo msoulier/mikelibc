@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -107,6 +108,16 @@ void test_fib(void) {
 }
 
 /*
+ * Test the dstnow function.
+ */
+void test_dstnow(void) {
+    setenv("TZ", "UTC", 1);
+    CU_ASSERT( dstnow() == 0 );
+    // Difficult to reliably test this in other zones without
+    // changing the system clock.
+}
+
+/*
  * Test the dns functions.
  */
 void test_dns(void) {
@@ -142,6 +153,7 @@ int main()
    /* add the tests to the suite */
    if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
         (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
+        (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
         (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
         (NULL == CU_add_test(pSuite, "test of dns functions", test_dns))
       )
