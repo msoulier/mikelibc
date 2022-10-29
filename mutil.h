@@ -2,6 +2,12 @@
 #define MUTIL_H
 
 #include <stdint.h>
+#include <string.h>
+#include <uint64.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/mman.h>
 
 uint64_t fibonacci(int n);
 

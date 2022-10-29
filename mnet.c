@@ -9,6 +9,7 @@
 
 #include "mnet.h"
 #include "mdebug.h"
+#include "mlogger.h"
 
 void paddr_error(int err) {
     fprintf(stderr, "maddr: ");
@@ -69,4 +70,99 @@ CLEANUP:
     if (infop != NULL)
         freeaddrinfo(infop);
     return rv;
+}
+
+int
+setup_udp_server(char *address, int port) {
+    struct sockaddr_in address_inet;
+    int inet_length;
+    int socketfd;
+    int rv;
+    int rcvbuf = 262144; // 2^18
+    socklen_t option_size;
+    int reuseaddr = 1;
+
+    logmsg(DEBUG, "setup_network: creating datagram socket");
+    socketfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (socketfd < 0)
+        return 0;
+
+    // Set up some socket options.
+    logmsg(DEBUG, "Setting SO_REUSEADDR to true");
+    setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr));
+
+    logmsg(DEBUG, "Setting SO_RCVBUF to %d bytes", rcvbuf);
+    if (setsockopt(socketfd,
+                   SOL_SOCKET,
+                   SO_RCVBUF,
+                   &rcvbuf, 
+                   sizeof(rcvbuf)) < 0)
+    {
+        logmsg(WARNING, "Failed to set SO_RCVBUF: %s",
+                strerror(errno));
+    }
+    else
+    {
+        option_size = sizeof(int);
+        if (getsockopt(socketfd,
+                       SOL_SOCKET,
+                       SO_RCVBUF,
+                       &rcvbuf,
+                       &option_size) < 0)
+        {
+            logmsg(WARNING, "getsockopt failed: %s",
+                    strerror(errno));
+        }
+        else
+        {
+            logmsg(DEBUG, "SO_RCVBUF is now %d bytes", rcvbuf);
+        }
+    }
+
+    memset(&address_inet, 0, sizeof(address_inet));
+    address_inet.sin_family = AF_INET;
+    address_inet.sin_port = htons(port);
+    address_inet.sin_addr.s_addr = inet_addr(address);
+
+    if (address_inet.sin_addr.s_addr == INADDR_NONE)
+        return 0;
+
+    inet_length = sizeof(address_inet);
+
+    logmsg(DEBUG, "binding to %s:%d", address, port);
+    rv = bind(socketfd, (struct sockaddr *)&address_inet, inet_length);
+    if (rv < 0)
+        return 0;
+
+    return socketfd;
+}
+
+char *
+read_dgram(int socketfd, char *dgram, size_t dgram_size) {
+    struct sockaddr_in address_client;
+    socklen_t inet_length;
+    int rv;
+
+    // NULL out the buffer.
+    memset(dgram, '\0', dgram_size);
+
+    // Check socket for data.
+    logmsg(DEBUG, "blocking on recvfrom...");
+    inet_length = sizeof(address_client);
+    rv = recvfrom(socketfd,
+                  dgram,
+                  dgram_size,
+                  0,
+                  (struct sockaddr *)&address_client,
+                  &inet_length);
+    logmsg(INFO, "returned from recvfrom, rv is %d", rv);
+    // FIXME - should we screen the size of the message here?
+    if (rv == 0) {
+        logmsg(WARNING, "Read 0 bytes from socket. Not sure why.");
+        return NULL;
+    } else if (rv < 0) {
+        logmsg(WARNING, "Error on socket: %s", strerror(errno));
+        return NULL;
+    }
+    return dgram;
 }
