@@ -24,6 +24,7 @@ help:
 
 libtai.a:
 	(cd libtai-0.60 && make libtai.a)
+	cp libtai-0.60/libtai.a .
 
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
@@ -50,6 +51,6 @@ test: all
 	(cd t && make clean && make MDEBUG=$(MDEBUG) && make run)
 
 clean:
-	rm -f libmike.a $(OBJS)
+	rm -f *.a *.o
 	(cd t && make clean)
 	(cd libtai-$(LIBTAIV) && rm -f *.o libtai.a)
