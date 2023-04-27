@@ -154,6 +154,14 @@ void test_popenRWE(void) {
     }
 }
 
+void test_tcp_client(void) {
+    int sockfd = connect_tcp_client("digitaltorque.ca", "80");
+    CU_ASSERT( sockfd > 0 );
+    if (sockfd > 0) {
+        printf("successfully connected via TCP to port 80 on digitaltorque.ca\n");
+    }
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -179,7 +187,8 @@ int main()
         (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
         (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
         (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
-        (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE))
+        (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
+        (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client))
       )
    {
       CU_cleanup_registry();

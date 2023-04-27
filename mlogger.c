@@ -22,7 +22,7 @@
 /* The type of logger, defaulting to stdout. */
 int loggertype = LOGGER_STDOUT;
 /* The current log severity level. */
-logseverity_t loggerseverity = INFO;
+logseverity_t loggerseverity = MLOG_INFO;
 /* Whether to show timestamps. */
 int timestamptype = LOCNOZONE;
 /* The FILE pointer of the logfile. */
@@ -196,22 +196,22 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
         if (timestamptype == UTC)
             fprintf(logfile, "UTC ");
         switch (severity) {
-        case ALL:
+        case MLOG_ALL:
             fprintf(logfile, "ALL: ");
             break;
-        case DEBUG:
+        case MLOG_DEBUG:
             fprintf(logfile, "DEBUG: ");
             break;
-        case INFO:
+        case MLOG_INFO:
             fprintf(logfile, "INFO: ");
             break;
-        case WARNING:
+        case MLOG_WARNING:
             fprintf(logfile, "WARNING: ");
             break;
-        case ERROR:
+        case MLOG_ERROR:
             fprintf(logfile, "ERROR: ");
             break;
-        case CRITICAL:
+        case MLOG_CRITICAL:
             fprintf(logfile, "CRITICAL: ");
             break;
         default:

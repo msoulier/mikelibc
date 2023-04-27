@@ -27,4 +27,16 @@ setup_udp_server(char *address, int port);
 char *
 read_dgram(int socketfd, char *dgram, size_t dgram_size);
 
+/*
+ * Set up a TCP server. Return the socket fd, or 0 on error.
+ */
+int
+setup_tcp_server(char *address, int port, int backlog);
+
+/*
+ * Connect to a TCP server. Return the socket fd, or -1 on error.
+ */
+int
+connect_tcp_client(char *address, char *port);
+
 #endif

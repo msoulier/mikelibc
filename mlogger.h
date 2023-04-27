@@ -28,12 +28,12 @@ int setloggertype(int type, char *path);
 
 // Log severity levels
 typedef enum {
-    ALL         = 0,
-    DEBUG       = 10,
-    INFO        = 20,
-    WARNING     = 30,
-    ERROR       = 40,
-    CRITICAL    = 50
+    MLOG_ALL         = 0,
+    MLOG_DEBUG       = 10,
+    MLOG_INFO        = 20,
+    MLOG_WARNING     = 30,
+    MLOG_ERROR       = 40,
+    MLOG_CRITICAL    = 50
 } logseverity_t;
 
 /* This function sets the current severity of the logger. */
