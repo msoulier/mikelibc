@@ -9,6 +9,10 @@
 
 #include "mdebug.h"
 
+#ifdef MIKELIBC_THREADS
+pthread_mutex_t mdebug_mutex;
+#endif
+
 #define TSTAMP_SIZE 1024
 
 /* Ideas...

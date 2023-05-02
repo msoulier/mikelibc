@@ -12,7 +12,7 @@ ifeq ($(MDEBUG),1)
     CFLAGS += -ggdb -DMDEBUG -fsanitize=address
 endif
 
-ifeq ($(threads),1)
+ifeq ($(MTHREADS),1)
     CFLAGS += -DMIKELIBC_THREADS
 endif
 

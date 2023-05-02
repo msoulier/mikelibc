@@ -3,9 +3,9 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#ifdef PTHREADS
+#ifdef MIKELIBC_THREADS
 #include <pthread.h>
-static pthread_mutex_t mdebug_mutex;
+extern pthread_mutex_t mdebug_mutex;
 #endif
 
 /* A simple software assertion that does not terminate the executable.

@@ -14,6 +14,7 @@
 #define mlinked_list_add(start, new_node, current) {    \
     if (start == NULL) {                                \
         start = new_node;                               \
+        current = new_node;                             \
     }                                                   \
     else {                                              \
         current = start;                                \
@@ -29,7 +30,8 @@
  * to nodes, while check is a function with signature
  * int check(handle, current), which takes the handle argument, and
  * the current pointer, and returns 1 or 0 based on whether the current
- * node is the node being sought.
+ * node is the node being sought. Note that handle is something that you
+ * populate. 
  */
 #define mlinked_list_find(start, current, check, handle) { \
     if (start == NULL) {                                \
