@@ -2,7 +2,7 @@ LIBTAIV=0.60
 #CC=c99
 CC=gcc
 CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
-OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o mnet.o
+OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0
 
@@ -10,6 +10,7 @@ MDEBUG=0
 
 ifeq ($(MDEBUG),1)
     CFLAGS += -ggdb -DMDEBUG -fsanitize=address
+	LIBS += -lasan
 endif
 
 ifeq ($(MTHREADS),1)
@@ -40,6 +41,9 @@ mlogger.o: mlogger.c mlogger.h
 
 mutil.o: mutil.c mutil.h
 	$(CC) $(CFLAGS) -c mutil.c
+
+mstring.o: mstring.c mstring.h
+	$(CC) $(CFLAGS) -c mstring.c
 
 madt.o: madt.c madt.h
 	$(CC) $(CFLAGS) -c madt.c

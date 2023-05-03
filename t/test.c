@@ -8,6 +8,8 @@
 #include "madt.h"
 #include "mnet.h"
 #include "mdebug.h"
+#include "mstring.h"
+#include "mlogger.h"
 #include "CUnit/Basic.h"
 
 typedef struct mll_node {
@@ -162,6 +164,17 @@ void test_tcp_client(void) {
     }
 }
 
+void test_msplit(void) {
+    char tstring[] = "--file=- --debug --tcp";
+    char **split = msplit(tstring, NULL);
+    CU_ASSERT( split != NULL );
+    int i = 0;
+    while (split[i] != NULL) {
+        printf("string %d: %s\n", i, split[i]);
+    }
+    free_msplit(split);
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -169,6 +182,9 @@ void test_tcp_client(void) {
 int main()
 {
    CU_pSuite pSuite = NULL;
+
+   setloggertype(LOGGER_STDOUT, NULL);
+   setloggersev(MLOG_INFO);
 
    /* initialize the CUnit test registry */
    if (CUE_SUCCESS != CU_initialize_registry())
@@ -188,6 +204,7 @@ int main()
         (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
         (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
         (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
+        (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
         (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client))
       )
    {

@@ -8,6 +8,7 @@ MDEBUG=0
 
 ifeq ($(MDEBUG),1)
     CFLAGS += -ggdb -DMDEBUG -fsanitize=address
+	LIBS += -lasan
 endif
 
 ifeq ($(threads),1)
