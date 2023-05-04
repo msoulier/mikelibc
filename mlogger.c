@@ -71,6 +71,7 @@ int setloggertype(int type, char* path)
     FILE *lfile;
 
     loggertype = type;
+    // FIXME: clean this up
     if (type == LOGGER_FILE)
     {
         if (path != NULL)
@@ -81,20 +82,16 @@ int setloggertype(int type, char* path)
                 perror("logfile");
                 loggertype = LOGGER_NONE;
                 return -1;
-            }
-            else
-            {
+            } else {
                 logfile = lfile;
             }
-        }
-        else
-        {
+        } else {
             fprintf(stderr, "Warning: Requested file logger, but path is NULL\n");
             return -1;
         }
-    }
-    else
-    {
+    } else if (type == LOGGER_STDERR) {
+        logfile = stderr;
+    } else {
         logfile = stdout;
     }
     return 1;
@@ -189,6 +186,7 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
         fprintf(logfile, "Warning: syslog support not implemented.\n");
         /* fall through for now */
     case LOGGER_STDOUT:
+    case LOGGER_STDERR:
     case LOGGER_FILE:
         // FIXME - use hires timer and provide milliseconds?
         if (timestamptype)

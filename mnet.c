@@ -60,7 +60,7 @@ int maddrlookup(const char *host, const char *service, mSockType socktype) {
     mdebugf("getaddrinfo rv was %d\n", rv);
     for (current = infop; current != NULL; current = current->ai_next) {
         struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
-        printf("\n%s port: %d protocol: %d\n",
+        mdebugf("\n%s port: %d protocol: %d\n",
            inet_ntoa(sa->sin_addr),
            ntohs(sa->sin_port),
            current->ai_protocol);

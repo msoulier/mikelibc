@@ -9,6 +9,7 @@
 #define LOGGER_STDOUT    0
 #define LOGGER_SYSLOG    1
 #define LOGGER_FILE      2
+#define LOGGER_STDERR    3
 
 #define FORMAT_TAI64N     1
 
@@ -16,9 +17,11 @@
 
 /* This function sets the type of the logger.
  * type is one of
+ * - LOGGER_NONE
  * - LOGGER_STDOUT
  * - LOGGER_SYSLOG
  * - LOGGER_FILE
+ * - LOGGER_STDERR
  * If the type is LOGGER_FILE, then the path argument is required, otherwise
  * it can be NULL.
  * On any errors, the logger type will be set to LOGGER_NONE, and -1 will be

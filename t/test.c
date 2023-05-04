@@ -168,10 +168,18 @@ void test_msplit(void) {
     char tstring[] = "--file=- --debug --tcp";
     char **split = msplit(tstring, NULL);
     CU_ASSERT( split != NULL );
-    int i = 0;
-    while (split[i] != NULL) {
-        printf("string %d: %s\n", i, split[i]);
-    }
+    CU_ASSERT( strcmp(split[0], "--file=-") == 0 );
+    printf("string 0 is '%s'\n", split[0]);
+    CU_ASSERT( split[0][8] == '\0' );
+
+    CU_ASSERT( strcmp(split[1], "--debug") == 0 );
+    printf("string 1 is '%s'\n", split[1]);
+    CU_ASSERT( split[1][8] == '\0' );
+
+    CU_ASSERT( strcmp(split[2], "--tcp") == 0 );
+    printf("string 2 is '%s'\n", split[2]);
+    CU_ASSERT( split[2][6] == '\0' );
+
     free_msplit(split);
 }
 
@@ -183,8 +191,10 @@ int main()
 {
    CU_pSuite pSuite = NULL;
 
-   setloggertype(LOGGER_STDOUT, NULL);
-   setloggersev(MLOG_INFO);
+   setloggertype(LOGGER_STDERR, NULL);
+   setloggersev(MLOG_DEBUG);
+
+   logmsg(MLOG_DEBUG, "===================> starting tests <=============");
 
    /* initialize the CUnit test registry */
    if (CUE_SUCCESS != CU_initialize_registry())
