@@ -40,7 +40,6 @@ void paddr_error(int err) {
 int maddrlookup(const char *host, const char *service, mSockType socktype) {
     int rv;
     struct addrinfo *infop = NULL;
-    struct addrinfo *current = NULL;
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET; // AF_UNSPEC for v4 or v6
@@ -58,6 +57,8 @@ int maddrlookup(const char *host, const char *service, mSockType socktype) {
         goto CLEANUP;
     }
     mdebugf("getaddrinfo rv was %d\n", rv);
+#ifdef MDEBUG
+    struct addrinfo *current = NULL;
     for (current = infop; current != NULL; current = current->ai_next) {
         struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
         mdebugf("\n%s port: %d protocol: %d\n",
@@ -65,6 +66,7 @@ int maddrlookup(const char *host, const char *service, mSockType socktype) {
            ntohs(sa->sin_port),
            current->ai_protocol);
     }
+#endif
 CLEANUP:
     mdebugf("CLEANUP: calling freeaddrinfo\n");
     if (infop != NULL)
