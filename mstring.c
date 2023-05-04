@@ -91,6 +91,8 @@ char **msplit(char *input_string, const char * const separators) {
             }
         }
     }
+    mdebugf("freeing seps array\n");
+    free(seps);
     mdebugf("putting a NULL at word %d\n", nwords);
     split_array[nwords] = NULL;
     mdebugf("returning an array of %d words\n", nwords);
@@ -101,9 +103,11 @@ void
 free_msplit(char **split_string) {
     int i = 0;
     while (split_string[i] != NULL) {
+        mdebugf("free_msplit: freeing string %d\n", i);
         free(split_string[i]);
         i++;
     }
+    mdebugf("free_msplit: freeing main array\n");
     free(split_string);
 }
 

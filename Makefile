@@ -9,7 +9,11 @@ MDEBUG=0
 .PHONY: clean test
 
 ifeq ($(MDEBUG),1)
-    CFLAGS += -ggdb -DMDEBUG -fsanitize=address
+    CFLAGS += -ggdb -DMDEBUG
+endif
+
+ifeq ($(ASAN),1)
+	CFLAGS += -fsanitize=address
 	LIBS += -lasan
 endif
 
