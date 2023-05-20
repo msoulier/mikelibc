@@ -1,7 +1,7 @@
 LIBTAIV=0.60
 #CC=c99
 CC=gcc
-CFLAGS=-Wall -DLINUX -I./libtai-$(LIBTAIV)
+CFLAGS=-Wall -I./libtai-$(LIBTAIV)
 OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0

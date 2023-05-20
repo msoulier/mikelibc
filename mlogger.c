@@ -1,12 +1,8 @@
 #include <time.h>
 
-#ifdef LINUX
 #include <sys/time.h>
 #include "taia.h"
 #include "leapsecs.h"
-#elif WIN32
-#include <windows.h>
-#endif
 
 #ifdef MIKELIBC_THREADS
 #include <pthread.h>
@@ -105,23 +101,13 @@ void setloggersev(logseverity_t severity)
 void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
-#ifdef LINUX
     struct taia tnow;
     struct timeval tv;
     char *tf0 = "";
     char *tf1 = "%a %b %e %H:%M:%S";
     char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
     char *tf;
-#elif WIN32
-    SYSTEMTIME systemtime;
-    char *day_of_the_week[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-    char *month_name[] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        };
-#endif
 
-#ifdef LINUX
     switch (timestamptype) {
     case LOCNOZONE:
     case UTC:
@@ -135,11 +121,9 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
         tf = tf0;
         break;
     }
-#endif
 
     if (timestamptype)
     {
-#ifdef LINUX
         gettimeofday(&tv, NULL);
         if (timestamptype == UTC)
         {
@@ -155,25 +139,6 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
         {
             strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
         }
-#elif WIN32
-        // Lets try to get basic timestamps working on windows before using anything fancy.
-        if (timestamptype == UTC)
-        {
-            GetSystemTime(&systemtime);
-            sprintf(timebuf, "%s %s %d %02d:%02d:%02d", 
-                day_of_the_week[systemtime.wDayOfWeek],
-                month_name[systemtime.wMonth-1],
-                systemtime.wDay, 
-                systemtime.wHour,
-                systemtime.wMinute,
-                systemtime.wSecond);
-        }
-        else
-        {
-            fprintf(logfile, "Warning: Only UTC time implemented on win32.\n");
-            timebuf[0] = '\0';
-        }
-#endif
     }
 
     if (severity < loggerseverity)
@@ -231,11 +196,6 @@ void logmsg(logseverity_t severity, const char *fmt, ...)
 {
     va_list argp;
 #ifdef MIKELIBC_THREADS
-
-#ifdef WIN32
-#error "No thread support on Win32 yet"
-#endif
-
     pthread_mutex_lock(&logging_mutex);
 #endif
     va_start(argp, fmt);
