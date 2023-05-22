@@ -1,8 +1,15 @@
 #include <time.h>
 
 #include <sys/time.h>
+
+#ifdef __cplusplus
+extern "C" {
 #include "taia.h"
 #include "leapsecs.h"
+#else
+#include "taia.h"
+#include "leapsecs.h"
+#endif
 
 #ifdef MIKELIBC_THREADS
 #include <pthread.h>
@@ -205,3 +212,6 @@ void logmsg(logseverity_t severity, const char *fmt, ...)
     pthread_mutex_unlock(&logging_mutex);
 #endif
 }
+#ifdef __cplusplus
+};
+#endif
