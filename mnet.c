@@ -245,7 +245,7 @@ setup_tcp_server(char *address, int port, int backlog) {
 }
 
 int
-connect_tcp_client(char *address, char *port) {
+connect_tcp_client(const char *address, const char *port) {
     struct addrinfo hints;
     struct addrinfo *infop = NULL;
     struct addrinfo *current = NULL;

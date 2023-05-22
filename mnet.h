@@ -37,6 +37,6 @@ setup_tcp_server(char *address, int port, int backlog);
  * Connect to a TCP server. Return the socket fd, or -1 on error.
  */
 int
-connect_tcp_client(char *address, char *port);
+connect_tcp_client(const char *address, const char *port);
 
 #endif
