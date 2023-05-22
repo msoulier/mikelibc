@@ -1,6 +1,10 @@
 #ifndef MNET_H
 #define MNET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     TCP = 1,
     UDP,
@@ -38,5 +42,9 @@ setup_tcp_server(char *address, int port, int backlog);
  */
 int
 connect_tcp_client(const char *address, const char *port);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

@@ -9,7 +9,7 @@
 #include "mnet.h"
 #include "mdebug.h"
 #include "mstring.h"
-#include "mlogger.h"
+#include "mlog.h"
 #include "CUnit/Basic.h"
 
 typedef struct mll_node {

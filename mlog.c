@@ -11,7 +11,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "mlogger.h"
+#include "mlog.h"
 
 #define TAIN_SIZE 12
 

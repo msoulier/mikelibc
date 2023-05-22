@@ -2,7 +2,7 @@ LIBTAIV=0.60
 #CC=c99
 CC=gcc
 CFLAGS=-Wall -I./libtai-$(LIBTAIV)
-OBJS=mikelib.o mdebug.o mlogger.o mutil.o madt.o mnet.o mstring.o
+OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0
 
@@ -40,8 +40,8 @@ mikelib.o: mikelib.c mikelib.h
 mdebug.o: mdebug.c mdebug.h
 	$(CC) $(CFLAGS) -c mdebug.c
 
-mlogger.o: mlogger.c mlogger.h
-	$(CC) $(CFLAGS) -c mlogger.c
+mlog.o: mlog.c mlog.h
+	$(CC) $(CFLAGS) -c mlog.c
 
 mutil.o: mutil.c mutil.h
 	$(CC) $(CFLAGS) -c mutil.c

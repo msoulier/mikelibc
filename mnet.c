@@ -9,7 +9,6 @@
 
 #include "mnet.h"
 #include "mdebug.h"
-#include "mlogger.h"
 
 void paddr_error(int err) {
     fprintf(stderr, "maddr: ");
@@ -84,24 +83,20 @@ setup_udp_server(char *address, int port) {
     socklen_t option_size;
     int reuseaddr = 1;
 
-    logmsg(MLOG_DEBUG, "setup_network: creating datagram socket");
     socketfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socketfd < 0)
         return 0;
 
     // Set up some socket options.
-    logmsg(MLOG_DEBUG, "Setting SO_REUSEADDR to true");
     setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr));
 
-    logmsg(MLOG_DEBUG, "Setting SO_RCVBUF to %d bytes", rcvbuf);
     if (setsockopt(socketfd,
                    SOL_SOCKET,
                    SO_RCVBUF,
                    &rcvbuf, 
                    sizeof(rcvbuf)) < 0)
     {
-        logmsg(MLOG_WARNING, "Failed to set SO_RCVBUF: %s",
-                             strerror(errno));
+        fprintf(stderr, "Failed to set SO_RCVBUF: %s", strerror(errno));
     }
     else
     {
@@ -112,12 +107,7 @@ setup_udp_server(char *address, int port) {
                        &rcvbuf,
                        &option_size) < 0)
         {
-            logmsg(MLOG_WARNING, "getsockopt failed: %s",
-                    strerror(errno));
-        }
-        else
-        {
-            logmsg(MLOG_DEBUG, "SO_RCVBUF is now %d bytes", rcvbuf);
+            fprintf(stderr, "getsockopt failed: %s", strerror(errno));
         }
     }
 
@@ -131,7 +121,6 @@ setup_udp_server(char *address, int port) {
 
     inet_length = sizeof(address_inet);
 
-    logmsg(MLOG_DEBUG, "binding to %s:%d", address, port);
     rv = bind(socketfd, (struct sockaddr *)&address_inet, inet_length);
     if (rv < 0)
         return 0;
@@ -149,7 +138,6 @@ read_dgram(int socketfd, char *dgram, size_t dgram_size) {
     memset(dgram, '\0', dgram_size);
 
     // Check socket for data.
-    logmsg(MLOG_DEBUG, "blocking on recvfrom...");
     inet_length = sizeof(address_client);
     rv = recvfrom(socketfd,
                   dgram,
@@ -157,13 +145,11 @@ read_dgram(int socketfd, char *dgram, size_t dgram_size) {
                   0,
                   (struct sockaddr *)&address_client,
                   &inet_length);
-    logmsg(MLOG_INFO, "returned from recvfrom, rv is %d", rv);
     // FIXME - should we screen the size of the message here?
     if (rv == 0) {
-        logmsg(MLOG_WARNING, "Read 0 bytes from socket. Not sure why.");
         return NULL;
     } else if (rv < 0) {
-        logmsg(MLOG_WARNING, "Error on socket: %s", strerror(errno));
+        fprintf(stderr, "Error on socket: %s", strerror(errno));
         return NULL;
     }
     return dgram;
@@ -179,7 +165,6 @@ setup_tcp_server(char *address, int port, int backlog) {
     socklen_t option_size;
     int reuseaddr = 1;
 
-    logmsg(MLOG_DEBUG, "setup_network: creating stream socket");
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd < 0) {
         perror("socket");
@@ -187,18 +172,15 @@ setup_tcp_server(char *address, int port, int backlog) {
     }
 
     // Set up some socket options.
-    logmsg(MLOG_DEBUG, "Setting SO_REUSEADDR to true");
     setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr));
 
-    logmsg(MLOG_DEBUG, "Setting SO_RCVBUF to %d bytes", rcvbuf);
     if (setsockopt(socketfd,
                    SOL_SOCKET,
                    SO_RCVBUF,
                    &rcvbuf, 
                    sizeof(rcvbuf)) < 0)
     {
-        logmsg(MLOG_WARNING, "Failed to set SO_RCVBUF: %s",
-                strerror(errno));
+        fprintf(stderr, "Failed to set SO_RCVBUF: %s", strerror(errno));
     }
     else
     {
@@ -209,12 +191,7 @@ setup_tcp_server(char *address, int port, int backlog) {
                        &rcvbuf,
                        &option_size) < 0)
         {
-            logmsg(MLOG_WARNING, "getsockopt failed: %s",
-                    strerror(errno));
-        }
-        else
-        {
-            logmsg(MLOG_DEBUG, "SO_RCVBUF is now %d bytes", rcvbuf);
+            fprintf(stderr, "getsockopt failed: %s", strerror(errno));
         }
     }
 
@@ -228,14 +205,12 @@ setup_tcp_server(char *address, int port, int backlog) {
 
     inet_length = sizeof(address_inet);
 
-    logmsg(MLOG_DEBUG, "binding to %s:%d", address, port);
     rv = bind(socketfd, (struct sockaddr *)&address_inet, inet_length);
     if (rv < 0) {
         perror("bind");
         return 0;
     }
 
-    logmsg(MLOG_DEBUG, "listen with backlog of %d", backlog);
     if (listen(socketfd, backlog) != 0) {
         perror("listen");
         return 0;
@@ -259,47 +234,42 @@ connect_tcp_client(const char *address, const char *port) {
     hints.ai_flags = 0;
     hints.ai_protocol = IPPROTO_TCP;
 
-    logmsg(MLOG_DEBUG, "getaddrinfo: address is %s", address);
-
     if ((rv = getaddrinfo(address, port, &hints, &infop)) != 0) {
         paddr_error(rv);
         rv = -1;
         goto CLEANUP;
     }
-    logmsg(MLOG_DEBUG, "getaddrinfo: rv was %d", rv);
     for (current = infop; current != NULL; current = current->ai_next) {
-        struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
-        logmsg(MLOG_DEBUG, "\n%s port: %d protocol: %d\n", inet_ntoa(sa->sin_addr),
+        //struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
+        /* logmsg(MLOG_DEBUG, "\n%s port: %d protocol: %d\n", inet_ntoa(sa->sin_addr),
                                                       ntohs(sa->sin_port),
-                                                      current->ai_protocol);
+                                                      current->ai_protocol); */
 
         clientfd = socket(current->ai_family, current->ai_socktype, current->ai_protocol);
         if (clientfd == -1) {
-            logmsg(MLOG_DEBUG, "socket creation failed: %s", strerror(errno));
+            fprintf(stderr, "socket creation failed: %s", strerror(errno));
             continue;
         }
-        logmsg(MLOG_DEBUG, "connecting to ...");
         if (connect(clientfd, current->ai_addr, current->ai_addrlen) < 0) {
             perror("connect");
             rv = -1;
             goto CLEANUP;
         }
         if (getsockname(clientfd, (struct sockaddr*)&clientsock, &clientsock_len) < 0) {
-            logmsg(MLOG_DEBUG, "failed to resolve local address info: %s", strerror(errno));
-        } else {
-            logmsg(MLOG_DEBUG, "local port is %d", ntohs(clientsock.sin_port));
         }
+        /* else {
+            logmsg(MLOG_DEBUG, "local port is %d", ntohs(clientsock.sin_port));
+        } */
         // If we're here we connected.
         rv = clientfd;
         break;
     }
     if (current == NULL) {
-        logmsg(MLOG_WARNING, "failed to connect to all resolved hosts");
+        fprintf(stderr, "failed to connect to all resolved hosts");
         rv = -1;
         goto CLEANUP;
     }
 CLEANUP:
-    logmsg(MLOG_DEBUG, "CLEANUP: calling freeaddrinfo");
     if (infop != NULL)
         freeaddrinfo(infop);
     return rv;
