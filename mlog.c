@@ -7,6 +7,7 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -29,6 +30,20 @@ void vmlogf(mlog_t *logger, logseverity_t severity, const char *fmt, va_list arg
     const char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
     const char *tf;
 
+    // Only continue if the severity of this message >= the logger severity.
+    if (severity < logger->severity) {
+        goto CLEANUP_AND_RETURN;
+    }
+
+    // If there's a callback installed, use it instead.
+    if (logger->callback != NULL) {
+        char buffer[MAX_LOG];
+        vsnprintf(buffer, MAX_LOG, fmt, argp);
+        logger->callback(logger->severity, buffer, logger->cb_data);
+        return;
+    }
+
+    // Otherwise, we use ours.
     switch (logger->logtime) {
         case LOCNOZONE:
         case UTC:
@@ -51,10 +66,6 @@ void vmlogf(mlog_t *logger, logseverity_t severity, const char *fmt, va_list arg
         } else {
             strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
         }
-    }
-
-    if (severity < logger->severity) {
-        goto CLEANUP_AND_RETURN;
     }
 
     switch (logger->loggertype) {
@@ -136,6 +147,7 @@ get_mlogger(loggertype_t loggertype, logseverity_t severity, logtime_t logtime) 
     pthread_mutex_lock(&logging_mutex);
 #endif
 
+    // FIXME: need a constructor
     mlog_handle_t handle = next_handle;
 
     new_logger->loggertype = loggertype;
@@ -145,6 +157,8 @@ get_mlogger(loggertype_t loggertype, logseverity_t severity, logtime_t logtime) 
     new_logger->path = NULL;
     new_logger->next = NULL;
     new_logger->logfile = NULL;
+    new_logger->callback = NULL;
+    new_logger->cb_data = NULL;
 
     next_handle++;
 
@@ -291,6 +305,16 @@ void setloggersev(mlog_handle_t handle, logseverity_t severity) {
     mlog_t *logger = find_mlogger(handle);
     if (logger != NULL) {
         logger->severity = severity;
+    } else {
+        fprintf(stderr, "Invalid logger handle %d\n", handle);
+    }
+}
+
+void register_mlog_callback(mlog_handle_t handle, mlog_cb_t cb_fn_ptr, void *cb_ptr) {
+    mlog_t *logger = find_mlogger(handle);
+    if (logger != NULL) {
+        logger->callback = cb_fn_ptr;
+        logger->cb_data = cb_ptr;
     } else {
         fprintf(stderr, "Invalid logger handle %d\n", handle);
     }

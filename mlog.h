@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #define TIMEBUF 128
+#define MAX_LOG 4096
 
 /*
  * A handle to a particular logger. Using an int for now.
@@ -51,6 +52,24 @@ typedef enum {
 } logtime_t;
 
 /*
+ * A logger callback that the client of the library can use so that the default
+ * logger is not used and the client's logger is used instead. The parameters are:
+ *
+ * @param severity
+ *      The log severity of the message.
+ *
+ * @param message
+ *      The message to be written to the log.
+ *
+ * @param cb_ptr
+ *      Extra logger data to be passed in, set only once when registering
+ *      a logger. Can be NULL.
+ */
+typedef void (*mlog_cb_t)(logseverity_t severity,
+                          const char *message,
+                          void *cb_ptr);
+
+/*
  * Encapsulation of a logger to permit multiple loggers.
  */
 typedef struct mlog {
@@ -60,6 +79,8 @@ typedef struct mlog {
     mlog_handle_t   handle;
     char            *path;
     FILE            *logfile;
+    mlog_cb_t       callback;
+    void            *cb_data;
     struct mlog     *next;
 } mlog_t;
 
@@ -110,6 +131,19 @@ shutdown_mlogger(mlog_handle_t handle);
  */
 void
 shutdown_all_mloggers();
+
+/*
+ * Register your own logger with mikelibc.
+ *
+ * @param mlog_handle_t
+ *      The handle of the logger to set the callback to.
+ *
+ * @param cb_fn_ptr
+ *      A mlog_cb_t function type which is invoked when logging.
+ *
+ * @return none
+ */
+void register_mlog_callback(mlog_handle_t handle, mlog_cb_t cb_fn_ptr, void *cb_ptr);
 
 #ifdef __cplusplus
 };
