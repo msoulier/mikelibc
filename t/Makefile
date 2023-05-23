@@ -28,4 +28,4 @@ test: test.o
 	$(CC) $(CFLAGS) -o test test.o $(LIBS)
 
 clean:
-	rm -f test *.o *.log
+	rm -f test *.o *.log core

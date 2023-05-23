@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "mdebug.h"
+#include "mlog.h"
 
 #define SPLIT_SIZE_INITIAL 8
 #define SPLIT_GROW_FACTOR 2

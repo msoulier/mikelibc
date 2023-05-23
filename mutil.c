@@ -5,6 +5,7 @@
 
 #include "mutil.h"
 #include "mdebug.h"
+#include "mlog.h"
 
 time_t now;
 struct tm now_tm;

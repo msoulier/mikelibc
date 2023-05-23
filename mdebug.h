@@ -22,9 +22,9 @@ dbg_printf(const char *fmt, ...);
  * fprintf out stderr otherwise.
  */
 #ifdef MDEBUG
-#define mdebugf(...) dbg_printf (__VA_ARGS__)
+#define mdbgf(...) dbg_printf (__VA_ARGS__)
 #else
-#define mdebugf(...)
+#define mdbgf(...)
 #endif
 
 #endif

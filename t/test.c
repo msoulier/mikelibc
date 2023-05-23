@@ -189,43 +189,44 @@ void test_msplit(void) {
  */
 int main()
 {
-   CU_pSuite pSuite = NULL;
+    CU_pSuite pSuite = NULL;
 
-   setloggertype(LOGGER_STDERR, NULL);
-   setloggersev(MLOG_DEBUG);
+    g_handle = get_mlogger(MLOG_STDERR, MLOG_DEBUG, LOCNOZONE);
 
-   logmsg(MLOG_DEBUG, "===================> starting tests <=============");
+    mdebugf("===================> starting tests <=============");
 
-   /* initialize the CUnit test registry */
-   if (CUE_SUCCESS != CU_initialize_registry())
-      return CU_get_error();
+    /* initialize the CUnit test registry */
+    if (CUE_SUCCESS != CU_initialize_registry())
+        return CU_get_error();
 
-   /* add a suite to the registry */
-   pSuite = CU_add_suite("Suite_1", init_suite1, clean_suite1);
-   if (NULL == pSuite) {
-      CU_cleanup_registry();
-      return CU_get_error();
-   }
+    /* add a suite to the registry */
+    pSuite = CU_add_suite("Suite_1", init_suite1, clean_suite1);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
 
-   /* add the tests to the suite */
-   if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
-        (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
-        (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
-        (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
-        (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
-        (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
-        (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
-        (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client))
-      )
-   {
-      CU_cleanup_registry();
-      return CU_get_error();
-   }
+    /* add the tests to the suite */
+    if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
+         (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
+         (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
+         (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
+         (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
+         (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
+         (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
+         (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client))
+       )
+    {
+       CU_cleanup_registry();
+       return CU_get_error();
+    }
 
-   /* Run all tests using the CUnit Basic interface */
-   CU_basic_set_mode(CU_BRM_VERBOSE);
-   CU_basic_run_tests();
-   CU_cleanup_registry();
-   return CU_get_error();
+    /* Run all tests using the CUnit Basic interface */
+    CU_basic_set_mode(CU_BRM_VERBOSE);
+    CU_basic_run_tests();
+    CU_cleanup_registry();
+
+    shutdown_all_mloggers();
+
+    return CU_get_error();
 }
-

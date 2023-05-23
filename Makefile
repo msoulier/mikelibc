@@ -53,5 +53,5 @@ test: all
 	(cd t && make clean && make MDEBUG=$(MDEBUG) && make run)
 
 clean:
-	rm -f *.a *.o
+	rm -f *.a *.o core
 	(cd t && make clean)

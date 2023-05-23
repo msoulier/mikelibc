@@ -222,7 +222,7 @@ setup_tcp_server(char *address, int port, int backlog) {
 
 int
 connect_tcp_client(const char *address, const char *port) {
-    logmsg(MLOG_DEBUG, "connect_tcp_client - address %s, port %s", address, port);
+    mdebugf("connect_tcp_client - address %s, port %s", address, port);
     struct addrinfo hints;
     struct addrinfo *infop = NULL;
     struct addrinfo *current = NULL;
@@ -242,10 +242,11 @@ connect_tcp_client(const char *address, const char *port) {
         goto CLEANUP;
     }
     for (current = infop; current != NULL; current = current->ai_next) {
-        //struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
-        /* logmsg(MLOG_DEBUG, "\n%s port: %d protocol: %d\n", inet_ntoa(sa->sin_addr),
-                                                      ntohs(sa->sin_port),
-                                                      current->ai_protocol); */
+        struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
+        mdebugf("\n%s port: %d protocol: %d\n",
+                inet_ntoa(sa->sin_addr),
+                ntohs(sa->sin_port),
+                current->ai_protocol);
 
         clientfd = socket(current->ai_family, current->ai_socktype, current->ai_protocol);
         if (clientfd == -1) {
@@ -259,9 +260,9 @@ connect_tcp_client(const char *address, const char *port) {
         }
         if (getsockname(clientfd, (struct sockaddr*)&clientsock, &clientsock_len) < 0) {
         }
-        /* else {
-            logmsg(MLOG_DEBUG, "local port is %d", ntohs(clientsock.sin_port));
-        } */
+        else {
+            mdebugf("local port is %d", ntohs(clientsock.sin_port));
+        }
         // If we're here we connected.
         rv = clientfd;
         break;
