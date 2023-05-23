@@ -11,8 +11,6 @@
 #define LOGGER_FILE      2
 #define LOGGER_STDERR    3
 
-#define FORMAT_TAI64N     1
-
 #define TIMEBUF 128
 
 /* This function sets the type of the logger.
@@ -53,8 +51,7 @@ typedef enum {
     NONE        = 0,
     LOCNOZONE   = 1,
     LOCWZONE    = 2,
-    UTC         = 3,
-    TAI64N      = 4
+    UTC         = 3
 } logtime_t;
 
 /* This function sets the level of the timestamps used by the logger.
@@ -62,27 +59,7 @@ typedef enum {
  * LOCNOZONE - standard timestamps in localtime without zone
  * LOCWZONE  - standard timestamps in localtime with timezone
  * UTC       - standard timestamps in UTC
- * TAI64N    - timestamps in tai64n external format
- *                     (http://cr.yp.to/libtai/tai64.html)
  */
 void setloggertime(logtime_t tstype);
-/* Note, the tai64n handling will only handle leapseconds if you put
- * a leapsecs.dat file for it at /etc/leapsecs.dat. See libtai for full
- * details (http://cr.yp.to/libtai.html).
- * Note that this library makes use of libtai, which is in the public domain.
- */
-
-
-/* This function returns a timestamp for the current time, with the intention
- * of providing multiple formats based on input.
- *
- * The type argument is equivalent to the levels in setloggertime. Currently
- * the only supported type is FORMAT_TAI64N.
- *
- * The timebuf argument is a char* to a buffer to populate, that should be at
- * least TIMEBUF in size.
- */
-int
-gettimestamp(int format, char *timebuf);
 
 #endif

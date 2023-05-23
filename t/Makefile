@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -I..
-LIBS=-L.. -lmike -L../libtai-0.60 -ltai -lcunit
+LIBS=-L.. -lmike -lcunit
 TESTS=
 MDEBUG=0
 

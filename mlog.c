@@ -2,15 +2,6 @@
 
 #include <sys/time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#include "taia.h"
-#include "leapsecs.h"
-#else
-#include "taia.h"
-#include "leapsecs.h"
-#endif
-
 #ifdef MIKELIBC_THREADS
 #include <pthread.h>
 #endif
@@ -19,8 +10,6 @@ extern "C" {
 #include <errno.h>
 
 #include "mlog.h"
-
-#define TAIN_SIZE 12
 
 /* The type of logger, defaulting to stdout. */
 int loggertype = LOGGER_STDOUT;
@@ -33,36 +22,6 @@ FILE *logfile = NULL;
 #ifdef MIKELIBC_THREADS
 pthread_mutex_t logging_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
-
-void
-taia2ext(char *timebuf, struct taia *tnow)
-{
-    char packed[TAIA_PACK];
-    char temp[5];
-    int i;
-
-    timebuf[0] = '@';
-    timebuf++;
-    taia_pack(packed, tnow);
-    for (i = 0; i < TAIN_SIZE; ++i)
-    {
-        snprintf(temp, 5, "%2.2x", (unsigned char)packed[i]);
-        *timebuf++ = temp[0];
-        *timebuf++ = temp[1];
-    }
-    *timebuf = '\0';
-}
-
-int
-gettimestamp(int format, char *timebuf)
-{
-    struct taia tnow;
-    if (format != FORMAT_TAI64N)
-        return -1;
-    taia_now(&tnow);
-    taia2ext(timebuf, &tnow);
-    return 1;
-}
 
 void setloggertime(logtime_t tstype)
 {
@@ -108,7 +67,6 @@ void setloggersev(logseverity_t severity)
 void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
-    struct taia tnow;
     struct timeval tv;
     char *tf0 = "";
     char *tf1 = "%a %b %e %H:%M:%S";
@@ -132,18 +90,9 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
     if (timestamptype)
     {
         gettimeofday(&tv, NULL);
-        if (timestamptype == UTC)
-        {
+        if (timestamptype == UTC) {
             strftime(timebuf, TIMEBUF, tf, gmtime(&tv.tv_sec));
-        }
-        else if (timestamptype == TAI64N)
-        {
-            leapsecs_init();
-            taia_now(&tnow);
-            taia2ext(timebuf, &tnow);
-        }
-        else
-        {
+        } else {
             strftime(timebuf, TIMEBUF, tf, localtime(&tv.tv_sec));
         }
     }
