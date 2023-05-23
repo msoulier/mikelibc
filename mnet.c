@@ -9,6 +9,7 @@
 
 #include "mnet.h"
 #include "mdebug.h"
+#include "mlog.h"
 
 void paddr_error(int err) {
     fprintf(stderr, "maddr: ");
@@ -221,6 +222,7 @@ setup_tcp_server(char *address, int port, int backlog) {
 
 int
 connect_tcp_client(const char *address, const char *port) {
+    logmsg(MLOG_DEBUG, "connect_tcp_client - address %s, port %s", address, port);
     struct addrinfo hints;
     struct addrinfo *infop = NULL;
     struct addrinfo *current = NULL;

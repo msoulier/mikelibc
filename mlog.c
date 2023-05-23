@@ -68,10 +68,10 @@ void vlogmsg(logseverity_t severity, const char *fmt, va_list argp)
 {
     char timebuf[TIMEBUF];
     struct timeval tv;
-    char *tf0 = "";
-    char *tf1 = "%a %b %e %H:%M:%S";
-    char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
-    char *tf;
+    const char *tf0 = "";
+    const char *tf1 = "%a %b %e %H:%M:%S";
+    const char *tf2 = "%a %b %e %H:%M:%S %Z (UTC%z) %Y";
+    const char *tf;
 
     switch (timestamptype) {
     case LOCNOZONE:
@@ -161,6 +161,3 @@ void logmsg(logseverity_t severity, const char *fmt, ...)
     pthread_mutex_unlock(&logging_mutex);
 #endif
 }
-#ifdef __cplusplus
-};
-#endif
