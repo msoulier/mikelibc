@@ -88,10 +88,10 @@ void mlogf(mlog_handle_t handle, logseverity_t severity, const char *fmt, ...);
 
 // Convenience macros.
 #define mdebugf(...)    mlogf(g_handle, MLOG_DEBUG, __VA_ARGS__)
-#define minfof(...)     mlogf(g_handle, MLOG_DEBUG, __VA_ARGS__)
-#define mwarningf(...)  mlogf(g_handle, MLOG_DEBUG, __VA_ARGS__)
-#define merrorf(...)    mlogf(g_handle, MLOG_DEBUG, __VA_ARGS__)
-#define mcriticalf(...) mlogf(g_handle, MLOG_DEBUG, __VA_ARGS__)
+#define minfof(...)     mlogf(g_handle, MLOG_INFO, __VA_ARGS__)
+#define mwarningf(...)  mlogf(g_handle, MLOG_WARNING, __VA_ARGS__)
+#define merrorf(...)    mlogf(g_handle, MLOG_ERROR, __VA_ARGS__)
+#define mcriticalf(...) mlogf(g_handle, MLOG_CRITICAL, __VA_ARGS__)
 
 /*
  * Create a new logger and return the handle for it. Return -1 on error.
