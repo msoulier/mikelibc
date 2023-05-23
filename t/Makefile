@@ -3,6 +3,7 @@ CFLAGS=-Wall -I..
 LIBS=-L.. -lmike -lcunit
 TESTS=
 MDEBUG=0
+MTHREADS=1
 
 .PHONY: clean test
 
@@ -15,7 +16,7 @@ ifeq ($(ASAN),1)
 	LIBS += -lasan
 endif
 
-ifeq ($(threads),1)
+ifeq ($(MTHREADS),1)
     CFLAGS += -DMIKELIBC_THREADS
 endif
 

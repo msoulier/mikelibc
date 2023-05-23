@@ -3,6 +3,7 @@ CFLAGS=-Wall
 OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0
+MTHREADS=1
 
 .PHONY: clean test
 

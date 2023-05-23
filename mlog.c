@@ -21,9 +21,7 @@ pthread_mutex_t logging_mutex = PTHREAD_MUTEX_INITIALIZER;
 mlog_handle_t g_handle = -1;
 
 void vmlogf(mlog_t *logger, logseverity_t severity, const char *fmt, va_list argp) {
-    if (logger != NULL) {
-        fprintf(stderr, "logger is not NULL\n");
-    }
+    assert( logger != NULL );
     char timebuf[TIMEBUF];
     struct timeval tv;
     const char *tf0 = "";
