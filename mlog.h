@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // This needs to go away in favour of a proper logger handler system.
 #define LOGGER_NONE     -1
 #define LOGGER_STDOUT    0
@@ -61,5 +65,9 @@ typedef enum {
  * UTC       - standard timestamps in UTC
  */
 void setloggertime(logtime_t tstype);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
