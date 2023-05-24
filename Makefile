@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS=-Wall
+# Note: if using -std=c11 then -D_POSIX_C_SOURCE=200112L is required
+CFLAGS=-Wall -std=gnu11
 OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0
