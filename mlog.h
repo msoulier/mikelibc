@@ -32,7 +32,7 @@ typedef enum {
 
 // Log severity levels
 typedef enum {
-    MLOG_ALL         = 0,
+    MLOG_TRACE       = 0,
     MLOG_DEBUG       = 10,
     MLOG_INFO        = 20,
     MLOG_WARNING     = 30,

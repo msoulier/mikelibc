@@ -84,7 +84,7 @@ void vmlogf(mlog_t *logger, logseverity_t severity, const char *fmt, va_list arg
             if (logger->logtime == UTC)
                 fprintf(logger->logfile, "UTC ");
             switch (severity) {
-                case MLOG_ALL:
+                case MLOG_TRACE:
                     fprintf(logger->logfile, "ALL: ");
                     break;
                 case MLOG_DEBUG:
