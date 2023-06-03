@@ -19,6 +19,7 @@
 pthread_mutex_t logging_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+// A global handler to represent the default logger.
 mlog_handle_t g_handle = -1;
 
 void vmlogf(mlog_t *logger, logseverity_t severity, const char *fmt, va_list argp) {
@@ -122,14 +123,10 @@ CLEANUP_AND_RETURN:
  */
 mlog_t *mloggers = NULL;
 
-/*
- * The global counter for logger handlers.
- */
-#ifdef MIKELIBC_THREADS
-volatile mlog_handle_t next_handle = 0;
-#else
+// The global incrementing counter for handlers. Not the same as a count.
 mlog_handle_t next_handle = 0;
-#endif
+// The global count of logger handlers.
+uint32_t nloggers = 0;
 
 /*
  * Create a new logger and return the handle for it.
@@ -161,8 +158,14 @@ get_mlogger(loggertype_t loggertype, logseverity_t severity, logtime_t logtime) 
     new_logger->cb_data = NULL;
 
     next_handle++;
+    nloggers++;
 
     mlinked_list_add(mloggers, new_logger, current);
+
+    // Set the default logger to 0.
+    if (g_handle < 0) {
+        g_handle = 0;
+    }
 
     // FIXME: terrible workaround
     setloggertype(handle, loggertype, NULL);
@@ -203,6 +206,10 @@ shutdown_mlogger(mlog_handle_t handle) {
         return 0;
     } else {
         free(freenode);
+        nloggers--;
+        if (nloggers == 0) {
+            g_handle = -1;
+        }
         return 1;
     }
 }
@@ -221,8 +228,11 @@ shutdown_all_mloggers() {
     while (current != NULL) {
         current = current->next;
         free(previous);
+        nloggers--;
         previous = current;
     }
+    assert( nloggers == 0 );
+    g_handle = -1;
 
     mloggers = NULL;
 
