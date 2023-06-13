@@ -1,6 +1,10 @@
 #ifndef _MIKELIBC_ADT_H_
 #define _MIKELIBC_ADT_H_
 
+#ifdef MIKELIBC_THREADS
+#include <pthread.h>
+#endif
+
 #include "mdebug.h"
 
 /*
@@ -100,5 +104,32 @@ mbtree_int_node_t* new_mbtree_int_node(int value);
 void free_mbtree_int_node(mbtree_int_node_t *node);
 
 void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
+
+/*
+ * A thread-safe queue.
+ */
+
+// FIXME - dynamic, max size
+#define MAX_QUEUE_SIZE 10
+
+typedef struct {
+    int data[MAX_QUEUE_SIZE];
+    int front;
+    int rear;
+    int count;
+#ifdef MIKELIBC_THREADS
+    pthread_mutex_t mutex;
+    pthread_cond_t full;
+    pthread_cond_t empty;
+#endif
+} mqueue_t;
+
+void mqueue_init(mqueue_t *queue);
+
+void mqueue_destroy(mqueue_t *queue);
+
+void mqueue_enqueue(mqueue_t *queue, int item);
+
+int mqueue_dequeue(mqueue_t *queue);
 
 #endif

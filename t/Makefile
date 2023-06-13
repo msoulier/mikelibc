@@ -18,6 +18,7 @@ endif
 
 ifeq ($(MTHREADS),1)
     CFLAGS += -DMIKELIBC_THREADS
+	LIBS += -lpthread
 endif
 
 all: test

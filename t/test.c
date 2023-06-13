@@ -164,6 +164,43 @@ void test_tcp_client(void) {
     }
 }
 
+// For testing the ThreadSafeQueue
+void* producer(void* arg) {
+    mqueue_t *queue = (mqueue_t*)arg;
+    int i;
+    for (i = 0; i < MAX_QUEUE_SIZE * 2; i++) {
+        mqueue_enqueue(queue, i);
+        printf("Producer enqueued: %d\n", i);
+    }
+    return NULL;
+}
+
+// For testing the ThreadSafeQueue
+void* consumer(void* arg) {
+    mqueue_t *queue = (mqueue_t*)arg;
+    int i;
+    for (i = 0; i < MAX_QUEUE_SIZE * 2; i++) {
+        int item = mqueue_dequeue(queue);
+        printf("Consumer dequeued: %d\n", item);
+    }
+    return NULL;
+}
+
+void test_mqueue(void) {
+    pthread_t producerThread, consumerThread;
+    mqueue_t queue;
+
+    mqueue_init(&queue);
+
+    pthread_create(&producerThread, NULL, producer, &queue);
+    pthread_create(&consumerThread, NULL, consumer, &queue);
+
+    pthread_join(producerThread, NULL);
+    pthread_join(consumerThread, NULL);
+
+    mqueue_destroy(&queue);
+}
+
 void test_msplit(void) {
     char tstring[] = "--file=- --debug --tcp";
     char **split = msplit(tstring, NULL);
@@ -214,6 +251,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
          (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
          (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
+         (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client))
        )
     {
