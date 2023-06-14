@@ -5,6 +5,8 @@
 #include <pthread.h>
 #endif
 
+#include <stdint.h>
+
 #include "mdebug.h"
 
 /*
@@ -106,17 +108,17 @@ void free_mbtree_int_node(mbtree_int_node_t *node);
 void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
 
 /*
- * A thread-safe queue.
+ * A thread-safe queue. Stores void* on the queue, you need to do
+ * the casting.
  */
-
-// FIXME - dynamic, max size
-#define MAX_QUEUE_SIZE 10
-
 typedef struct {
-    int data[MAX_QUEUE_SIZE];
-    int front;
-    int rear;
-    int count;
+    void **data;
+    uint32_t front;
+    uint32_t rear;
+    uint32_t alloc_size;
+    uint32_t current_size;
+    uint32_t max_size;
+    uint32_t gc_run;
 #ifdef MIKELIBC_THREADS
     pthread_mutex_t mutex;
     pthread_cond_t full;
@@ -124,12 +126,43 @@ typedef struct {
 #endif
 } mqueue_t;
 
-void mqueue_init(mqueue_t *queue);
+/*
+ * Initialize a new mqueue. Takes the initial size, and an optional
+ * maximum size. If max_size is 0, consider the maximum size to be
+ * unlimited.
+ */
+void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size);
 
+/*
+ * When done with an mqueue, clean up the memory used by it.
+ */
 void mqueue_destroy(mqueue_t *queue);
 
-void mqueue_enqueue(mqueue_t *queue, int item);
+/*
+ * Enqueue a new void* something onto the queue. If we are at the
+ * maximum size, and are multi-threaded, spin on the condition
+ * variable until there is room. If not multi-threaded, return -1.
+ * Return the new queue count on success.
+ */
+uint32_t mqueue_enqueue(mqueue_t *queue, void *item);
 
-int mqueue_dequeue(mqueue_t *queue);
+/*
+ * Dequeue a void* from the end of the queue, if anything. If we are at
+ * zero size, and are multi-threaded, spin on the condition variable
+ * until there is something on the queue. Otherwise return NULL. The
+ * item is returned on success.
+ */
+void *mqueue_dequeue(mqueue_t *queue);
+
+/*
+ * The queue is wasteful of memory in the name of performance. As items are
+ * added to it, the internal array is grown if required. But as items are
+ * removed, the space is not reallocated. This results in the queue using an
+ * increasing amount of memory over time. This function gets rid of the wasted
+ * space on the queue. It need not be called directly, it will be called
+ * internally on a regular basis, but if an immediate reclamation of memory
+ * is needed, this can be called.
+ */
+void mqueue_vacuum(mqueue_t *queue);
 
 #endif

@@ -15,14 +15,14 @@ extern pthread_mutex_t mdebug_mutex;
     fprintf(stderr, "libesdb SWERR: File -> %s, Line -> %d\n", __FILE__, __LINE__) > 0)
 
 void
-dbg_printf(const char *fmt, ...);
+dbg_printf(const char *fname, const int lineno, const char *fmt, ...);
 
 /*
  * A debug macro that compiles out if MDEBUG is not set, and compiles to an
  * fprintf out stderr otherwise.
  */
 #ifdef MDEBUG
-#define mdbgf(...) dbg_printf (__VA_ARGS__)
+#define mdbgf(...) dbg_printf (__FILE__, __LINE__, __VA_ARGS__)
 #else
 #define mdbgf(...)
 #endif

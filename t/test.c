@@ -12,6 +12,8 @@
 #include "mlog.h"
 #include "CUnit/Basic.h"
 
+#define MAX_QUEUE 120
+
 typedef struct mll_node {
     int value;
     struct mll_node *next;
@@ -167,10 +169,12 @@ void test_tcp_client(void) {
 // For testing the ThreadSafeQueue
 void* producer(void* arg) {
     mqueue_t *queue = (mqueue_t*)arg;
-    int i;
-    for (i = 0; i < MAX_QUEUE_SIZE * 2; i++) {
-        mqueue_enqueue(queue, i);
-        printf("Producer enqueued: %d\n", i);
+    for (int i = 0; i < MAX_QUEUE * 2; i++) {
+        int *item = (int *)malloc(sizeof(int));
+        *item = i;
+        int rv = mqueue_enqueue(queue, (void *)item);
+        printf("Producer enqueued: %d\n", *item);
+        CU_ASSERT( rv > 0 );
     }
     return NULL;
 }
@@ -178,10 +182,11 @@ void* producer(void* arg) {
 // For testing the ThreadSafeQueue
 void* consumer(void* arg) {
     mqueue_t *queue = (mqueue_t*)arg;
-    int i;
-    for (i = 0; i < MAX_QUEUE_SIZE * 2; i++) {
-        int item = mqueue_dequeue(queue);
-        printf("Consumer dequeued: %d\n", item);
+    for (int i = 0; i < MAX_QUEUE * 2; i++) {
+        int *item = mqueue_dequeue(queue);
+        printf("Consumer dequeued: %d\n", *item);
+        CU_ASSERT( item != NULL );
+        free(item);
     }
     return NULL;
 }
@@ -190,13 +195,15 @@ void test_mqueue(void) {
     pthread_t producerThread, consumerThread;
     mqueue_t queue;
 
-    mqueue_init(&queue);
+    mqueue_init(&queue, 5, MAX_QUEUE);
 
     pthread_create(&producerThread, NULL, producer, &queue);
     pthread_create(&consumerThread, NULL, consumer, &queue);
 
     pthread_join(producerThread, NULL);
     pthread_join(consumerThread, NULL);
+
+    CU_ASSERT( queue.current_size == 0 );
 
     mqueue_destroy(&queue);
 }

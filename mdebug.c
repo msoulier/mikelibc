@@ -21,7 +21,7 @@ pthread_mutex_t mdebug_mutex;
  * - My own getline()
  */
 
-void dbg_printf(const char *fmt, ...)
+void dbg_printf(const char *fname, const int lineno, const char *fmt, ...)
 {
 #ifdef MIKELIBC_THREADS
     pthread_mutex_lock(&mdebug_mutex);
@@ -36,11 +36,12 @@ void dbg_printf(const char *fmt, ...)
     pid_t tid;
     tid = syscall(SYS_gettid);
     //fprintf(stderr, "[%d][%d] [DEBUG]: ", getpid(), tid);
-    fprintf(stderr, "%s [%d] [DEBUG]: ", ts, tid);
+    fprintf(stderr, "%s [%d] [DEBUG] ", ts, tid);
 #else
     //fprintf(stderr, "[%d] [DEBUG]: ", getpid());
-    fprintf(stderr, "%s [DEBUG]: ", ts);
+    fprintf(stderr, "%s [DEBUG] ", ts);
 #endif
+    fprintf(stderr, "[%s:%d] ", fname, lineno);
     vfprintf(stderr, fmt, args);
     va_end(args);
 #ifdef MIKELIBC_THREADS
