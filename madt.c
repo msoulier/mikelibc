@@ -43,12 +43,12 @@ const uint32_t GC_COUNT = 100;
 void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size) {
     queue->front = 0;
     queue->rear = -1;
-    queue->alloc_size = initial_size * sizeof(void *);
-    queue->current_size = 0;
+    queue->alloc_size = initial_size;
     queue->max_size = max_size;
     queue->gc_run = GC_COUNT;
-    mdbgf("mallocing %d bytes of memory for the mqueue\n", queue->alloc_size);
-    queue->data = (void **)malloc(initial_size*sizeof(void *));
+    size_t data_size = queue->alloc_size * sizeof(void *);
+    mdbgf("mallocing %d bytes of memory for the mqueue\n", data_size);
+    queue->data = malloc(data_size);
     assert( queue->data != NULL );
 #ifdef MIKELIBC_THREADS
     pthread_mutex_init(&(queue->mutex), NULL);
@@ -68,55 +68,53 @@ void mqueue_destroy(mqueue_t *queue) {
 
 // Always enqueue to the end of the array, and grow if required.
 uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
-    mdbgf("enqueuing item, queue->current_size is %d\n", queue->current_size);
+    mdbgf("enqueuing item, queue->current_size is %d\n", mqueue_size(queue));
     if (queue->max_size > 0) {
 #ifdef MIKELIBC_THREADS
         pthread_mutex_lock(&(queue->mutex));
-        while (queue->current_size == queue->max_size) {
+        while (mqueue_size(queue) == queue->max_size) {
             pthread_cond_wait(&(queue->full), &(queue->mutex));
         }
 #else
         // Check for maximum size
-        if (queue->current_size == queue->max_size) {
+        if (mqueue_size(queue) == queue->max_size) {
             return -1;
         }
 #endif
     }
     // Is there enough allocated space on the array?
-    if (queue->current_size == queue->alloc_size) {
+    queue->rear++;
+    if (queue->rear == queue->alloc_size) {
         // Double the size.
-        mdbgf("realloc from %d to %d\n",
-                queue->alloc_size, queue->alloc_size*2);
-        queue->data = realloc(queue->data, queue->alloc_size*2);
+        size_t data_size = queue->alloc_size * sizeof(void *);
+        mdbgf("realloc from %d to %d\n", data_size, data_size*2);
+        queue->data = realloc(queue->data, data_size*2);
         assert( queue->data != NULL );
         queue->alloc_size *= 2;
     }
-    queue->rear++;
     queue->data[queue->rear] = item;
-    queue->current_size++;
 #ifdef MIKELIBC_THREADS
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
-    return queue->current_size;
+    return mqueue_size(queue);
 }
 
 void *mqueue_dequeue(mqueue_t *queue) {
-    mdbgf("dequeueing item, queue->current_size is %d\n", queue->current_size);
+    mdbgf("dequeueing item, queue->current_size is %d\n", mqueue_size(queue));
     void *item;
 #ifdef MIKELIBC_THREADS
     pthread_mutex_lock(&(queue->mutex));
-    while (queue->current_size == 0) {
+    while (mqueue_size(queue) == 0) {
         pthread_cond_wait(&(queue->empty), &(queue->mutex));
     }
 #else
-    if (queue->current_size == 0) {
+    if (mqueue_size(queue) == 0) {
         return NULL;
     }
 #endif
     item = queue->data[queue->front];
     queue->front++;
-    queue->current_size--;
     queue->gc_run--;
     // Housekeeping
     if (queue->gc_run == 0) {
@@ -130,20 +128,26 @@ void *mqueue_dequeue(mqueue_t *queue) {
     return item;
 }
 
+uint32_t mqueue_size(mqueue_t *queue) {
+    return queue->rear+1 - queue->front;
+}
+
 void mqueue_vacuum(mqueue_t *queue) {
     // Note: This runs inside of the acquired mutex if running
     // multi-threaded.
-    mdbgf("in mqueue_vacuum\n");
+    mdbgf("in mqueue_vacuum: queue->front is %d, queue->rear is %d\n",
+            queue->front, queue->rear);
     if (queue->front == 0) {
         // Nothing to do.
         return;
     }
     // Converting a void** to a void* for memmove.
     void *dest = queue->data;
-    void *src = queue->data + queue->rear;
-    size_t bytes2copy = sizeof(void *) * (queue->rear+1 - queue->front);
-    mdbgf("moving %d bytes to fix slack\n");
+    void *src = queue->data + queue->front;
+    size_t bytes2copy = sizeof(void *) * mqueue_size(queue);
+    mdbgf("moving %d bytes to fix slack\n", bytes2copy);
     dest = memmove(dest, src, bytes2copy);
+    queue->rear -= queue->front;
     queue->front = 0;
-    queue->rear = bytes2copy-1;
+    mdbgf("queue->front is now 0, queue->rear is now %d\n", queue->rear);
 }

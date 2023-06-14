@@ -118,7 +118,7 @@ typedef struct {
     uint32_t current_size;
     uint32_t max_size;
     uint32_t gc_run;
-    size_t alloc_size;
+    uint32_t alloc_size;
 #ifdef MIKELIBC_THREADS
     pthread_mutex_t mutex;
     pthread_cond_t full;
@@ -153,6 +153,12 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item);
  * item is returned on success.
  */
 void *mqueue_dequeue(mqueue_t *queue);
+
+/*
+ * Return the current size of the queue, in the number of items
+ * it is holding.
+ */
+uint32_t mqueue_size(mqueue_t *queue);
 
 /*
  * The queue is wasteful of memory in the name of performance. As items are

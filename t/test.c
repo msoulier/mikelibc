@@ -184,8 +184,9 @@ void* consumer(void* arg) {
     mqueue_t *queue = (mqueue_t*)arg;
     for (int i = 0; i < MAX_QUEUE * 2; i++) {
         int *item = mqueue_dequeue(queue);
-        printf("Consumer dequeued: %d\n", *item);
         CU_ASSERT( item != NULL );
+        CU_ASSERT( *item == i );
+        printf("Consumer dequeued: %d\n", *item);
         free(item);
     }
     return NULL;
