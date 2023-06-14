@@ -115,10 +115,10 @@ typedef struct {
     void **data;
     uint32_t front;
     uint32_t rear;
-    uint32_t alloc_size;
     uint32_t current_size;
     uint32_t max_size;
     uint32_t gc_run;
+    size_t alloc_size;
 #ifdef MIKELIBC_THREADS
     pthread_mutex_t mutex;
     pthread_cond_t full;

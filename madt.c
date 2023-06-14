@@ -41,17 +41,15 @@ const uint32_t GC_COUNT = 100;
  * Methods for the mqueue_t.
  */
 void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size) {
-    mdbgf("mallocing %d bytes of memory for the mqueue\n",
-            initial_size*sizeof(void *));
-    mdbgf("the size of a void * is %d bytes\n", sizeof(void *));
-    queue->data = (void **)malloc(initial_size*sizeof(void *));
-    assert( queue->data != NULL );
     queue->front = 0;
     queue->rear = -1;
-    queue->alloc_size = initial_size;
+    queue->alloc_size = initial_size * sizeof(void *);
     queue->current_size = 0;
     queue->max_size = max_size;
     queue->gc_run = GC_COUNT;
+    mdbgf("mallocing %d bytes of memory for the mqueue\n", queue->alloc_size);
+    queue->data = (void **)malloc(initial_size*sizeof(void *));
+    assert( queue->data != NULL );
 #ifdef MIKELIBC_THREADS
     pthread_mutex_init(&(queue->mutex), NULL);
     pthread_cond_init(&(queue->full), NULL);
