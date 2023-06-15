@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 #include <errno.h>
 
 #include "madt.h"
@@ -37,13 +38,11 @@ int
 main(int argc, char *argv[]) {
     double total = 0;
     for (int i = 0; i < TEST_RUNS; i++) {
-        struct timeval start;
-        struct timeval end;
-        bzero(&start, sizeof(struct timeval));
-        bzero(&end, sizeof(struct timeval));
+        struct rusage start;
+        struct rusage end;
 
-        if (gettimeofday(&start, NULL) < 0) {
-            perror("gettimeofday");
+        if (getrusage(RUSAGE_SELF, &start) < 0) {
+            perror("getrusage");
             continue;
         }
 
@@ -60,12 +59,15 @@ main(int argc, char *argv[]) {
 
         mqueue_destroy(&queue);
 
-        if (gettimeofday(&end, NULL) < 0) {
-            perror("gettimeofday");
+        if (getrusage(RUSAGE_SELF, &end) < 0) {
+            perror("getrusage");
             continue;
         }
 
-        suseconds_t diff = end.tv_usec - start.tv_usec;
+        struct timeval start_usage = start.ru_utime;
+        struct timeval end_usage = end.ru_utime;
+
+        suseconds_t diff = end_usage.tv_sec*1000000 + end_usage.tv_usec - start_usage.tv_sec*1000000 - start_usage.tv_usec;
         double mdiff = diff / 1000.0;
         if (diff > 0) {
             printf("Run %d: pushed %d items through the queue\n", i, MAX_QUEUE);
