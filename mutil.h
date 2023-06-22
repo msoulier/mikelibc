@@ -32,4 +32,18 @@ int dstnow();
  */
 int popenRWE(int *rwepipe, const char *exe, const char *const args[]);
 
+/*
+ * Taking a plaintext string, populate a crypttext, base64-encoded version.
+ * The resulting string is passed back. It is also heap allocated and should
+ * be freed when done. Not thread-safe.
+ */
+char *base64_encode(const char *plaintext, size_t input_size);
+
+/*
+ * Taking a crypttext string, populate a plaintext, base64-decoded version.
+ * The resulting string is passed back. It is also heap allocated and should
+ * be freed when done. Not thread-safe.
+ */
+char *base64_decode(const char *crypttext, size_t input_size);
+
 #endif

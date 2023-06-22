@@ -2,6 +2,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
 
 #include "mutil.h"
 #include "mdebug.h"
@@ -124,4 +127,78 @@ error_out:
 	close(in[1]);
 error_in:
 	return -1;
+}
+
+static char base64_chars[64] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+    };
+
+char *base64_encode(const char *plaintext, size_t input_size) {
+    // How much do we need for the crypttext?
+    size_t crypt_bytes;
+    crypt_bytes = input_size*8/6;
+    char *crypttext = (char *)malloc(crypt_bytes);
+    assert( crypttext != NULL );
+
+    // We want to convert every 3 bytes to 4 base64 bytes.
+    int plain_pos = 0;
+    int crypt_pos = 0;
+    while (1) {
+        uint8_t byte_one = 0;
+        uint8_t byte_two = 0;
+        uint8_t byte_three = 0;
+        uint8_t byte_four = 0;
+        int padding = 0;
+        // Mask out most significant 6 bits from input byte one.
+        byte_one = plaintext[plain_pos] & 0xfc;
+        // Mask out the 2 least significant bits from input byte one.
+        byte_two = plaintext[plain_pos] & 0x03;
+        byte_two = byte_two << 4;
+        // And add 4 bits from the next octet if ther is one.
+        if (plain_pos+1 < input_size) {
+            byte_two = byte_two | (( plaintext[plain_pos+1] & 0xf0 ) >> 2);
+            // byte_two is done, need the next 4 bits for byte_three
+            byte_three = plaintext[plain_pos+1] & 0x0f;
+            byte_three = byte_three << 4;
+            if (plain_pos+2 < input_size) {
+                // Need 2 more bits to complete byte_three.
+                byte_three = byte_three | (( plaintext[plain_pos+2] & 0xc0 ) >> 4 );
+                // And byte 4 is the remainder.
+                byte_four = plaintext[plain_pos+2] & 0x3f;
+                byte_four = byte_four << 2;
+            } else {
+                padding = 1;
+            }
+        } else {
+            padding = 2;
+        }
+        crypttext[crypt_pos++] = base64_chars[byte_one];
+        crypttext[crypt_pos++] = base64_chars[byte_two];
+        if (padding == 2) {
+            crypttext[crypt_pos++] = '=';
+            crypttext[crypt_pos++] = '=';
+        } else if (padding == 1) {
+            crypttext[crypt_pos++] = base64_chars[byte_three];
+            crypttext[crypt_pos++] = '=';
+        } else if (padding == 0) {
+            crypttext[crypt_pos++] = base64_chars[byte_three];
+            crypttext[crypt_pos++] = base64_chars[byte_four];
+        } else {
+            assert( 0 );
+        }
+
+        plain_pos += 3;
+        if (plain_pos >= input_size) {
+            break;
+        }
+    }
+    return crypttext;
+}
+
+char *base64_decode(const char *crypttext, size_t input_size) {
+    return NULL;
 }
