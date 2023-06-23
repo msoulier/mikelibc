@@ -201,6 +201,7 @@ unsigned char *encrypt_aes(unsigned char *key,
         return NULL;
     }
     crypttext_p += outlen;
+    *crypttext_p = '\0';
 
     EVP_CIPHER_CTX_free(ctx);
 
@@ -239,6 +240,7 @@ unsigned char *decrypt_aes(unsigned char *key,
         return NULL;
     }
     plaintext_p += outlen;
+    *plaintext_p = '\0';
 
     EVP_CIPHER_CTX_free(ctx);
 
