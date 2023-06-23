@@ -132,7 +132,7 @@ error_in:
 }
 
 char *base64_encode(const char *plaintext, size_t input_size) {
-	size_t crypttext_mem = 4*((input_size+2)/3);
+	int crypttext_mem = 4*((input_size+2)/3);
     // +1 for terminating null that EVP_EncodeBlock adds
     char *crypttext = (char *)malloc(crypttext_mem+1);
     int bytes = EVP_EncodeBlock((unsigned char*)crypttext,
@@ -151,7 +151,7 @@ char *base64_encode(const char *plaintext, size_t input_size) {
 }
 
 char *base64_decode(const char *crypttext, size_t input_size) {
-    size_t plaintext_mem = 3*input_size/4;
+    int plaintext_mem = 3*input_size/4;
     // +1 for terminating null that EVP_EncodeBlock adds
     char *plaintext = (char *)malloc(plaintext_mem+1);
     int bytes = EVP_DecodeBlock((unsigned char*)plaintext,

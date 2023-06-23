@@ -8,6 +8,10 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint64_t fibonacci(int n);
 
 uint64_t sfibonacci(int reset);
@@ -55,5 +59,10 @@ unsigned char *decrypt_aes(unsigned char *key,
                            unsigned char *iv, 
                            unsigned char *ciphertext,
                            int input_size);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
