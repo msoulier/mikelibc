@@ -235,23 +235,17 @@ void test_encrypt_decrypt(void) {
                                            strlen(password));
     CU_ASSERT( ciphertext != NULL );
 
-    CU_ASSERT( strcmp(password,
-                      (char *)decrypt_aes((unsigned char *)key,
+    char *decrypted = (char *)decrypt_aes((unsigned char *)key,
                                           (unsigned char *)iv,
                                           (unsigned char *)ciphertext,
-                                          strlen(ciphertext))) );
+                                          strlen(ciphertext));
+    CU_ASSERT( decrypted != NULL );
+    printf("\ndecrypted is '%s'\n", decrypted);
 
+    CU_ASSERT( strcmp(password, decrypted) == 0 );
 
-    return;
-
-
-    printf("base64 ciphertext is %s\n", base64_encode(ciphertext,
-                                                      strlen(ciphertext)));
-    CU_ASSERT( strcmp(password,
-                      (char *)decrypt_aes((unsigned char *)key,
-                                          (unsigned char *)iv,
-                                          (unsigned char *)base64_decode(ciphertext, strlen(ciphertext)),
-                                          strlen(ciphertext))) );
+    free(ciphertext);
+    free(decrypted);
 }
 
 void test_msplit(void) {
