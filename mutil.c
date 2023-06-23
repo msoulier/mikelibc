@@ -222,7 +222,8 @@ unsigned char *decrypt_aes(unsigned char *key,
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
 
-    EVP_DecryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+    //EVP_DecryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+    EVP_DecryptInit_ex(ctx, EVP_aes_128_cfb8(), NULL, key, iv);
 
     unsigned char *plaintext_p = (unsigned char *)plaintext;
     for (int i = 0; i < input_size; i++) {
