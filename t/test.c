@@ -214,6 +214,15 @@ void test_base64_encode(void) {
     char *output = base64_encode(input, strlen(input));
     printf("base64 of %s is '%s'\n", input, output);
     CU_ASSERT( output != NULL );
+    CU_ASSERT( strcmp(output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
+    free(output);
+}
+
+void test_base64_decode(void) {
+    char *input = "SGVsbG8sIFdvcmxkIQ==";
+    char *output = base64_decode(input, strlen(input));
+    printf("base64_decode of %s is %s", input, output);
+    free(output);
 }
 
 void test_msplit(void) {
@@ -268,7 +277,8 @@ int main()
          (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
-         (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode))
+         (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
+         (NULL == CU_add_test(pSuite, "test of base64_decode", test_base64_decode))
        )
     {
        CU_cleanup_registry();
