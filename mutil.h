@@ -46,4 +46,14 @@ char *base64_encode(const char *plaintext, size_t input_size);
  */
 char *base64_decode(const char *crypttext, size_t input_size);
 
+unsigned char *encrypt_aes(unsigned char *key,
+                           unsigned char *iv, 
+                           unsigned char *plaintext,
+                           int input_size);
+
+unsigned char *decrypt_aes(unsigned char *key,
+                           unsigned char *iv, 
+                           unsigned char *ciphertext,
+                           int input_size);
+
 #endif

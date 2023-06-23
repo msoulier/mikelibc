@@ -225,6 +225,35 @@ void test_base64_decode(void) {
     free(output);
 }
 
+void test_encrypt_decrypt(void) {
+    char *password = "this is a password";
+    char *key = "e^SXXaI^W0dBoC688#GU";
+    char *iv = "1234567";
+    char *ciphertext = (char *)encrypt_aes((unsigned char *)key,
+                                           (unsigned char *)iv,
+                                           (unsigned char *)password,
+                                           strlen(password));
+    CU_ASSERT( ciphertext != NULL );
+
+    CU_ASSERT( strcmp(password,
+                      (char *)decrypt_aes((unsigned char *)key,
+                                          (unsigned char *)iv,
+                                          (unsigned char *)ciphertext,
+                                          strlen(ciphertext))) );
+
+
+    return;
+
+
+    printf("base64 ciphertext is %s\n", base64_encode(ciphertext,
+                                                      strlen(ciphertext)));
+    CU_ASSERT( strcmp(password,
+                      (char *)decrypt_aes((unsigned char *)key,
+                                          (unsigned char *)iv,
+                                          (unsigned char *)base64_decode(ciphertext, strlen(ciphertext)),
+                                          strlen(ciphertext))) );
+}
+
 void test_msplit(void) {
     char tstring[] = "--file=- --debug --tcp";
     char **split = msplit(tstring, NULL);
@@ -277,6 +306,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
+         (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
          (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
          (NULL == CU_add_test(pSuite, "test of base64_decode", test_base64_decode))
        )

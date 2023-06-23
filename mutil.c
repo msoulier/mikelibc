@@ -138,6 +138,11 @@ char *base64_encode(const char *plaintext, size_t input_size) {
     int bytes = EVP_EncodeBlock((unsigned char*)crypttext,
                                 (unsigned char*)plaintext,
                                 input_size);
+    if (bytes < 0) {
+        merrorf("base64_encode: EVP_EncodeBlock returned an error");
+        free(crypttext);
+        return NULL;
+    }
     if (crypttext_mem != bytes) {
         mwarningf("base64_encode: expected %d bytes but got %d",
             crypttext_mem, bytes);
@@ -152,9 +157,90 @@ char *base64_decode(const char *crypttext, size_t input_size) {
     int bytes = EVP_DecodeBlock((unsigned char*)plaintext,
                                 (unsigned char*)crypttext,
                                 input_size);
+    if (bytes < 0) {
+        merrorf("base64_decode: EVP_DecodeBlock returned an error");
+        free(plaintext);
+        return NULL;
+    }
     if (bytes != plaintext_mem) {
         mwarningf("base64_decode: expected %d bytes but got %d",
             plaintext_mem, bytes);
     }
     return plaintext;
+}
+
+unsigned char *encrypt_aes(unsigned char *key,
+                           unsigned char *iv, 
+                           unsigned char *plaintext,
+                           int input_size)
+{
+    int outlen = 0;
+
+    // FIXME: how much do we need? Initially aim for input*2 to be safe.
+    char *crypttext = (char *)malloc(sizeof(char)*input_size*2);
+    assert( crypttext != NULL );
+
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
+
+    EVP_EncryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+
+    unsigned char *crypttext_p = (unsigned char *)crypttext;
+    for (int i = 0; i < input_size; i++) {
+        if (!EVP_EncryptUpdate(ctx, crypttext_p, &outlen, &plaintext[i], 1)) {
+            merrorf("encrypt_aes: EVP_EncryptUpdate returned an error");
+            free(crypttext);
+            return NULL;
+        }
+        crypttext_p += outlen;
+    }
+
+    if (!EVP_EncryptFinal(ctx, crypttext_p, &outlen)) {
+        merrorf("encrypt_aes: EVP_EncryptFinal returned an error");
+        free(crypttext);
+        return NULL;
+    }
+    crypttext_p += outlen;
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return (unsigned char *)crypttext;
+}
+
+unsigned char *decrypt_aes(unsigned char *key,
+                           unsigned char *iv, 
+                           unsigned char *ciphertext,
+                           int input_size)
+{
+    int outlen = 0;
+
+    // FIXME: how much do we need? Initially aim for input*2 to be safe.
+    char *plaintext = (char *)malloc(sizeof(char)*input_size*2);
+    assert( plaintext != NULL );
+
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
+
+    EVP_EncryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+
+    unsigned char *plaintext_p = (unsigned char *)plaintext;
+    for (int i = 0; i < input_size; i++) {
+        if (!EVP_DecryptUpdate(ctx, plaintext_p, &outlen, &ciphertext[i], 1)) {
+            merrorf("decrypt_aes: EVP_DecryptUpdate returned an error");
+            free(plaintext);
+            return NULL;
+        }
+        plaintext_p += outlen;
+    }
+
+    if (!EVP_DecryptFinal(ctx, plaintext_p, &outlen)) {
+        merrorf("decrypt_aes: EVP_DecryptFinal returned an error");
+        free(plaintext);
+        return NULL;
+    }
+    plaintext_p += outlen;
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return (unsigned char *)plaintext;
 }
