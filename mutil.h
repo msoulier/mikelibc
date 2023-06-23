@@ -50,11 +50,21 @@ char *base64_encode(const char *plaintext, size_t input_size);
  */
 char *base64_decode(const char *crypttext, size_t input_size);
 
+/*
+ * Taking a secret key and an initialization vector, plus the plaintext to
+ * encrypt and its size, encrypt the plaintext using AES 256 in CFB mode
+ * (symmetric cipher). Return the encrypted string, or NULL on error.
+ */
 unsigned char *encrypt_aes(unsigned char *key,
                            unsigned char *iv, 
                            unsigned char *plaintext,
                            int input_size);
 
+/*
+ * Taking a secret key and an initialization vector, plus the ciphertext to
+ * decrypt and its size, decrypt the ciphertext using AES 256 in CFB mode
+ * (symmetric cipher). Return the decrypted string, or NULL on error.
+ */
 unsigned char *decrypt_aes(unsigned char *key,
                            unsigned char *iv, 
                            unsigned char *ciphertext,
