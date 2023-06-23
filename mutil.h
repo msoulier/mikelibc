@@ -71,6 +71,8 @@ unsigned char *decrypt_aes(unsigned char *key,
                            int input_size);
 
 
+int digest_sha1(unsigned char *in, size_t in_length, unsigned char **digest, unsigned int *digest_len);
+
 #ifdef __cplusplus
 }
 #endif

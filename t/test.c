@@ -248,6 +248,18 @@ void test_encrypt_decrypt(void) {
     free(decrypted);
 }
 
+void test_sha1(void) {
+    unsigned char input[] = "This is my input";
+    unsigned char *output = NULL;
+    unsigned int outsize = 0;
+    if (digest_sha1(input, strlen((char *)input), &output, &outsize)) {
+        CU_ASSERT( 1 );
+    } else {
+        CU_ASSERT( 0 );
+    }
+    printf("the base64 sha1 hash of '%s' is '%s'\n", input, base64_encode((const char *)output, outsize));
+}
+
 void test_msplit(void) {
     char tstring[] = "--file=- --debug --tcp";
     char **split = msplit(tstring, NULL);
@@ -301,6 +313,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
          (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
+         (NULL == CU_add_test(pSuite, "test of sha1 function", test_sha1)) ||
          (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
          (NULL == CU_add_test(pSuite, "test of base64_decode", test_base64_decode))
        )

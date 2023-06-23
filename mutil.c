@@ -246,3 +246,34 @@ unsigned char *decrypt_aes(unsigned char *key,
 
     return (unsigned char *)plaintext;
 }
+
+int digest_sha1(unsigned char *in, size_t in_length, unsigned char **digest, unsigned int *digest_len) {
+    EVP_MD_CTX *mdctx;
+    int good = 0;
+
+    if ((mdctx = EVP_MD_CTX_new()) == NULL) {
+		goto CLEANUP;
+    }
+
+	if (1 != EVP_DigestInit_ex(mdctx, EVP_sha1(), NULL)) {
+		goto CLEANUP;
+    }
+
+	if (1 != EVP_DigestUpdate(mdctx, in, in_length)) {
+		goto CLEANUP;
+    }
+
+	if ((*digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha1()))) == NULL) {
+		goto CLEANUP;
+    }
+
+	if (1 != EVP_DigestFinal_ex(mdctx, *digest, digest_len)) {
+		goto CLEANUP;
+    } else {
+        good = 1;
+    }
+
+CLEANUP:
+    EVP_MD_CTX_free(mdctx);
+    return good;
+}
