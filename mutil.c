@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include <openssl/evp.h>
+
 #include "mutil.h"
 #include "mdebug.h"
 #include "mlog.h"
@@ -129,149 +131,30 @@ error_in:
 	return -1;
 }
 
-static char base64_chars[64] = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
-    };
-
 char *base64_encode(const char *plaintext, size_t input_size) {
-    mdebugf("base64_encode: plaintext %s, input_size %d", plaintext, input_size);
-    size_t crypt_bytes;
-    crypt_bytes = input_size*8/6;
-    char *crypttext = (char *)malloc(crypt_bytes);
-    assert( crypttext != NULL );
-
-    // We want to convert every 3 bytes to 4 base64 bytes.
-    int plain_pos = 0;
-    int crypt_pos = 0;
-    while (1) {
-        uint8_t byte_one = 0;
-        uint8_t byte_two = 0;
-        uint8_t byte_three = 0;
-        uint8_t byte_four = 0;
-        int padding = 0;
-        // Mask out most significant 6 bits from input byte one.
-        byte_one = plaintext[plain_pos] & 0xfc;
-        byte_one >>= 2;
-        // Mask out the 2 least significant bits from input byte one and
-        // put them onto output byte_two
-        byte_two = plaintext[plain_pos] & 0x03;
-        // Make room for the next 4 bits
-        byte_two <<= 4;
-        // And add 4 bits from the next octet if there is one.
-        if (plain_pos+1 < input_size) {
-            // Grab most significant 4 bits from next byte and shift right
-            // 4 to or them into output byte_two
-            byte_two |= ( plaintext[plain_pos+1] & 0xf0 ) >> 4;
-            // byte_two is done, need the next 4 bits for byte_three
-            byte_three = plaintext[plain_pos+1] & 0x0f;
-            // Make room for the next 2 bits.
-            byte_three <<= 2;
-            if (plain_pos+2 < input_size) {
-                // Need 2 more bits to complete byte_three, and shift right 4.
-                byte_three |= ( plaintext[plain_pos+2] & 0xc0 ) >> 6;
-                // And byte 4 is the remainder.
-                byte_four = plaintext[plain_pos+2] & 0x3f;
-            } else {
-                padding = 1;
-            }
-        } else {
-            padding = 2;
-        }
-        crypttext[crypt_pos++] = base64_chars[byte_one];
-        mdebugf("crypttext one is %c", base64_chars[byte_one]);
-        crypttext[crypt_pos++] = base64_chars[byte_two];
-        mdebugf("crypttext two is %c", base64_chars[byte_two]);
-        if (padding == 2) {
-            crypttext[crypt_pos++] = '=';
-            crypttext[crypt_pos++] = '=';
-            mdebugf("padding last two bytes with =");
-        } else if (padding == 1) {
-            crypttext[crypt_pos++] = base64_chars[byte_three];
-            mdebugf("crypttext three is %c", base64_chars[byte_three]);
-            crypttext[crypt_pos++] = '=';
-            mdebugf("padding last byte with =");
-        } else if (padding == 0) {
-            crypttext[crypt_pos++] = base64_chars[byte_three];
-            mdebugf("crypttext three is %c", base64_chars[byte_three]);
-            crypttext[crypt_pos++] = base64_chars[byte_four];
-            mdebugf("crypttext four is %c", base64_chars[byte_four]);
-        } else {
-            assert( 0 );
-        }
-        assert( byte_one <= 64 );
-        assert( byte_two <= 64 );
-        assert( byte_three <= 64 );
-        assert( byte_four <= 64 );
-
-        plain_pos += 3;
-        if (plain_pos >= input_size) {
-            break;
-        }
+	size_t crypttext_mem = 4*((input_size+2)/3);
+    // +1 for terminating null that EVP_EncodeBlock adds
+    char *crypttext = (char *)malloc(crypttext_mem+1);
+    int bytes = EVP_EncodeBlock((unsigned char*)crypttext,
+                                (unsigned char*)plaintext,
+                                input_size);
+    if (crypttext_mem != bytes) {
+        mwarningf("base64_encode: expected %d bytes but got %d",
+            crypttext_mem, bytes);
     }
-    crypttext[crypt_pos] = '\0';
     return crypttext;
 }
 
 char *base64_decode(const char *crypttext, size_t input_size) {
-    size_t plaintext_bytes = input_size*6/8;
-    mdebugf("base64_decode: crypttext %s, size %d", crypttext, input_size);
-    char *plaintext = (char *)malloc(plaintext_bytes);
-    assert( plaintext != NULL );
-
-    for (int i = 0; i < input_size; i++) {
-        char c = crypttext[i];
-        printf("dec %d, oct %o, hex %x, %c\n", c, c, c, c);
+    size_t plaintext_mem = 3*input_size/4;
+    // +1 for terminating null that EVP_EncodeBlock adds
+    char *plaintext = (char *)malloc(plaintext_mem+1);
+    int bytes = EVP_DecodeBlock((unsigned char*)plaintext,
+                                (unsigned char*)crypttext,
+                                input_size);
+    if (bytes != plaintext_mem) {
+        mwarningf("base64_decode: expected %d bytes but got %d",
+            plaintext_mem, bytes);
     }
-
-    int plaintext_pos = 0;
-    int crypttext_pos = 0;
-    while (1) {
-        // Loop four bytes at a time, turning them into three bytes by
-        // moving from 6-bits per 8-bits.
-        uint8_t byte_one = 0;
-        uint8_t byte_two = 0;
-        uint8_t byte_three = 0;
-
-        if (crypttext[crypttext_pos] == '=') {
-            break;
-        }
-        byte_one = crypttext[crypttext_pos] & 0x3f;
-
-        // And the next two bits from the next byte
-        if (crypttext[crypttext_pos+1] == '=') {
-            break;
-        }
-        byte_one |= (crypttext[crypttext_pos+1] & 0x03) << 6;
-        mdebugf("byte_one is %d %c", byte_one, byte_one);
-        // Next 4 bits to byte_two
-        byte_two = (crypttext[crypttext_pos+1] & 0x3c) >> 2;
-
-        if (crypttext[crypttext_pos+2] == '=') {
-            break;
-        }
-        // Next 4 bits to complete it
-        byte_two |= (crypttext[crypttext_pos+2] & 0x0f) << 4;
-        // byte_three is now 2 bits from this bytes plus 6 bits
-        // from the next one.
-        byte_three = (crypttext[crypttext_pos+2] & 0x30) >> 4;
-
-        if (crypttext[crypttext_pos+3] == '=') {
-            break;
-        }
-        byte_three |= (crypttext[crypttext_pos+3] & 0x3f) << 2;
-        crypttext_pos += 4;
-        if (crypttext_pos >= input_size) {
-            break;
-        }
-
-        plaintext[plaintext_pos++] = byte_one;
-        plaintext[plaintext_pos++] = byte_two;
-        plaintext[plaintext_pos++] = byte_three;
-    }
-    plaintext[plaintext_pos] = '\0';
     return plaintext;
 }

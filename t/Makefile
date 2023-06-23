@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -I..
-LIBS=-L.. -lmike -lcunit
+LIBS=-L.. -lmike -lcunit -lssl -lcrypto
 TESTS=
 MDEBUG=0
 MTHREADS=1

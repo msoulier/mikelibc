@@ -212,16 +212,16 @@ void test_mqueue(void) {
 void test_base64_encode(void) {
     char *input = "Hello, World!";
     char *output = base64_encode(input, strlen(input));
-    printf("base64 of %s is '%s'\n", input, output);
+    printf("\nbase64 of %s is '%s'\n", input, output);
     CU_ASSERT( output != NULL );
-    CU_ASSERT( strcmp(output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
+    CU_ASSERT( strcmp((char *)output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
     free(output);
 }
 
 void test_base64_decode(void) {
     char *input = "SGVsbG8sIFdvcmxkIQ==";
     char *output = base64_decode(input, strlen(input));
-    printf("base64_decode of %s is %s", input, output);
+    printf("\nbase64_decode of %s is %s", input, output);
     free(output);
 }
 
