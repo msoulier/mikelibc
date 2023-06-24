@@ -6,8 +6,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include <openssl/evp.h>
-
 #include "mutil.h"
 #include "mdebug.h"
 #include "mlog.h"
@@ -169,8 +167,9 @@ char *base64_decode(const char *crypttext, size_t input_size) {
     return plaintext;
 }
 
-unsigned char *encrypt_aes(unsigned char *key,
+unsigned char *encrypt_ssl(unsigned char *key,
                            unsigned char *iv, 
+                           const EVP_CIPHER *cipher_type,
                            unsigned char *plaintext,
                            int input_size)
 {
@@ -183,7 +182,11 @@ unsigned char *encrypt_aes(unsigned char *key,
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
 
-    EVP_EncryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+    if (cipher_type == NULL) {
+        EVP_EncryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+    } else {
+        EVP_EncryptInit_ex(ctx, cipher_type, NULL, key, iv);
+    }
 
     unsigned char *crypttext_p = (unsigned char *)crypttext;
     for (int i = 0; i < input_size; i++) {
@@ -208,8 +211,9 @@ unsigned char *encrypt_aes(unsigned char *key,
     return (unsigned char *)crypttext;
 }
 
-unsigned char *decrypt_aes(unsigned char *key,
+unsigned char *decrypt_ssl(unsigned char *key,
                            unsigned char *iv, 
+                           const EVP_CIPHER *cipher_type,
                            unsigned char *ciphertext,
                            int input_size)
 {
@@ -222,8 +226,11 @@ unsigned char *decrypt_aes(unsigned char *key,
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
 
-    //EVP_DecryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
-    EVP_DecryptInit_ex(ctx, EVP_aes_128_cfb8(), NULL, key, iv);
+    if (cipher_type == NULL) {
+        EVP_DecryptInit_ex(ctx, EVP_aes_256_cfb8(), NULL, key, iv);
+    } else {
+        EVP_DecryptInit_ex(ctx, cipher_type, NULL, key, iv);
+    }
 
     unsigned char *plaintext_p = (unsigned char *)plaintext;
     for (int i = 0; i < input_size; i++) {
@@ -248,7 +255,11 @@ unsigned char *decrypt_aes(unsigned char *key,
     return (unsigned char *)plaintext;
 }
 
-int digest_sha1(unsigned char *in, size_t in_length, unsigned char **digest, unsigned int *digest_len) {
+int digest_sha1(unsigned char *in,
+                size_t in_length,
+                unsigned char **digest,
+                unsigned int *digest_len)
+{
     EVP_MD_CTX *mdctx;
     int good = 0;
 

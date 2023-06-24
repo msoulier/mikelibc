@@ -229,16 +229,38 @@ void test_encrypt_decrypt(void) {
     char *password = "this is a password";
     char *key = "e^SXXaI^W0dBoC688#GU";
     char *iv = "1234567";
-    char *ciphertext = (char *)encrypt_aes((unsigned char *)key,
+    char *ciphertext = (char *)encrypt_ssl((unsigned char *)key,
                                            (unsigned char *)iv,
+                                           NULL,
                                            (unsigned char *)password,
                                            strlen(password));
     CU_ASSERT( ciphertext != NULL );
 
-    char *decrypted = (char *)decrypt_aes((unsigned char *)key,
+    char *decrypted = (char *)decrypt_ssl((unsigned char *)key,
                                           (unsigned char *)iv,
+                                          NULL,
                                           (unsigned char *)ciphertext,
                                           strlen(ciphertext));
+    CU_ASSERT( decrypted != NULL );
+    printf("\ndecrypted is '%s'\n", decrypted);
+
+    CU_ASSERT( strcmp(password, decrypted) == 0 );
+
+    free(ciphertext);
+    free(decrypted);
+
+    ciphertext = (char *)encrypt_ssl((unsigned char *)key,
+                                     (unsigned char *)iv,
+                                     EVP_aes_128_cfb8(),
+                                     (unsigned char *)password,
+                                     strlen(password));
+    CU_ASSERT( ciphertext != NULL );
+
+    decrypted = (char *)decrypt_ssl((unsigned char *)key,
+                                    (unsigned char *)iv,
+                                    EVP_aes_128_cfb8(),
+                                    (unsigned char *)ciphertext,
+                                    strlen(ciphertext));
     CU_ASSERT( decrypted != NULL );
     printf("\ndecrypted is '%s'\n", decrypted);
 

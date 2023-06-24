@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#include <openssl/evp.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,26 +54,41 @@ char *base64_decode(const char *crypttext, size_t input_size);
 
 /*
  * Taking a secret key and an initialization vector, plus the plaintext to
- * encrypt and its size, encrypt the plaintext using AES 256 in CFB mode
- * (symmetric cipher). Return the encrypted string, or NULL on error.
+ * encrypt and its size, encrypt the plaintext using the supplied cipher.
+ * Return the encrypted string, or NULL on error.
+ * The cipher_type can be any EVP_CIPHER for AES, like
+ *  EVP_aes_256_cfb8()
+ *  EVP_aes_128_cfb8()
+ * See EVP_CIPHER(3ssl) for all cipher types.
+ * If cipher_type is NULL, EVP_aes_256_cfb8() will be used.
  */
-unsigned char *encrypt_aes(unsigned char *key,
+unsigned char *encrypt_ssl(unsigned char *key,
                            unsigned char *iv, 
+                           const EVP_CIPHER *cipher_type,
                            unsigned char *plaintext,
                            int input_size);
 
 /*
  * Taking a secret key and an initialization vector, plus the ciphertext to
- * decrypt and its size, decrypt the ciphertext using AES 256 in CFB mode
- * (symmetric cipher). Return the decrypted string, or NULL on error.
+ * decrypt and its size, decrypt the ciphertext using the supplied cipher.
+ * Return the decrypted string, or NULL on error.
+ * The cipher_type can be any EVP_CIPHER for AES, like
+ *  EVP_aes_256_cfb8()
+ *  EVP_aes_128_cfb8()
+ * See EVP_CIPHER(3ssl) for all cipher types.
+ * If cipher_type is NULL, EVP_aes_256_cfb8() will be used.
  */
-unsigned char *decrypt_aes(unsigned char *key,
+unsigned char *decrypt_ssl(unsigned char *key,
                            unsigned char *iv, 
+                           const EVP_CIPHER *cipher_type,
                            unsigned char *ciphertext,
                            int input_size);
 
 
-int digest_sha1(unsigned char *in, size_t in_length, unsigned char **digest, unsigned int *digest_len);
+int digest_sha1(unsigned char *in,
+                size_t in_length,
+                unsigned char **digest,
+                unsigned int *digest_len);
 
 #ifdef __cplusplus
 }
