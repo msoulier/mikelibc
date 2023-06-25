@@ -9,7 +9,7 @@
 
 #include "mdebug.h"
 
-/*
+/**
  * The following macros are for managing a linked list, implemented
  * through C structs that have a "next" pointer. It should work with
  * any singly-linked list that has at least a "next" pointer, with the
@@ -31,7 +31,7 @@
     }                                                   \
 }
 
-/*
+/**
  * Find a node in the linked list. start and current are pointers
  * to nodes, while check is a function with signature
  * int check(handle, current), which takes the handle argument, and
@@ -54,7 +54,7 @@
     }                                                   \
 }
 
-/*
+/**
  * Remove a node from the linked-list. All options are pointers to
  * nodes, except check and handle, which work like in mlinked_list_find.
  * Note that freenode is populated with a pointer to the removed node.
@@ -81,7 +81,7 @@
     }                                                   \
 }
 
-/*
+/**
  * Count the nodes in the linked-list. start and current are node pointers
  * and length is an integer that will be populated with the length of
  * the list.
@@ -95,21 +95,33 @@
     }                                                   \
 }
 
+/**
+ * A single node in the mbtree.
+ */
 typedef struct mbtree_int_node {
     int value;
     struct mbtree_int_node *left;
     struct mbtree_int_node *right;
 } mbtree_int_node_t;
 
+/**
+ * A constructor for a new mbtree node.
+ */
 mbtree_int_node_t* new_mbtree_int_node(int value);
 
+/**
+ * A destrucctor for an mbtree node.
+ */
 void free_mbtree_int_node(mbtree_int_node_t *node);
 
+/**
+ * A basic in-order traversal of the mbtree.
+ */
 void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
 
-/*
+/**
  * A thread-safe queue. Stores void* on the queue, you need to do
- * the casting.
+ * the casting. Only thread-safe if build with MIKELIBC_THREADS=1.
  */
 typedef struct {
     void **data;
@@ -126,19 +138,19 @@ typedef struct {
 #endif
 } mqueue_t;
 
-/*
+/**
  * Initialize a new mqueue. Takes the initial size, and an optional
  * maximum size. If max_size is 0, consider the maximum size to be
  * unlimited.
  */
 void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size);
 
-/*
+/**
  * When done with an mqueue, clean up the memory used by it.
  */
 void mqueue_destroy(mqueue_t *queue);
 
-/*
+/**
  * Enqueue a new void* something onto the queue. If we are at the
  * maximum size, and are multi-threaded, spin on the condition
  * variable until there is room. If not multi-threaded, return -1.
@@ -146,7 +158,7 @@ void mqueue_destroy(mqueue_t *queue);
  */
 uint32_t mqueue_enqueue(mqueue_t *queue, void *item);
 
-/*
+/**
  * Dequeue a void* from the end of the queue, if anything. If we are at
  * zero size, and are multi-threaded, spin on the condition variable
  * until there is something on the queue. Otherwise return NULL. The
@@ -154,13 +166,13 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item);
  */
 void *mqueue_dequeue(mqueue_t *queue);
 
-/*
+/**
  * Return the current size of the queue, in the number of items
  * it is holding.
  */
 uint32_t mqueue_size(mqueue_t *queue);
 
-/*
+/**
  * The queue is wasteful of memory in the name of performance. As items are
  * added to it, the internal array is grown if required. But as items are
  * removed, the space is not reallocated. This results in the queue using an
