@@ -6,7 +6,7 @@ LIBS=
 MDEBUG=0
 MTHREADS=1
 
-.PHONY: clean test
+.PHONY: clean test doc
 
 ifeq ($(MDEBUG),1)
     CFLAGS += -ggdb -DMDEBUG
@@ -54,6 +54,10 @@ mnet.o: mnet.c mnet.h
 test: all
 	(cd t && make clean && make MDEBUG=$(MDEBUG) && make run)
 
+doc:
+	doxygen Doxyfile
+
 clean:
 	rm -f *.a *.o core
+	rm -rf doc
 	(cd t && make clean)
