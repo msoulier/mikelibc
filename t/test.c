@@ -270,13 +270,14 @@ void test_encrypt_decrypt(void) {
     free(decrypted);
 }
 
-void test_sha1(void) {
+void test_sha1_hexdigest(void) {
     unsigned char input[] = "This is my input";
     unsigned char *output = NULL;
     unsigned int outsize = 0;
     output = digest_sha1(input, strlen((char *)input), &outsize);
     CU_ASSERT( output != NULL );
     printf("the base64 sha1 hash of '%s' is '%s'\n", input, base64_encode((const char *)output, outsize));
+    printf("the hexdigest of the sha1 hash is %s\n", hexdigest(output, outsize));
 }
 
 void test_msplit(void) {
@@ -332,7 +333,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
          (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
-         (NULL == CU_add_test(pSuite, "test of sha1 function", test_sha1)) ||
+         (NULL == CU_add_test(pSuite, "test of sha1 and hexdigest function", test_sha1_hexdigest)) ||
          (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
          (NULL == CU_add_test(pSuite, "test of base64_decode", test_base64_decode))
        )

@@ -287,3 +287,23 @@ CLEANUP:
     EVP_MD_CTX_free(mdctx);
     return digest;
 }
+
+char *hexdigest(unsigned char *in,
+                size_t in_length)
+{
+    char hexbuf[3];
+    char *digest = NULL;
+    // Should be x2 the input length.
+    digest = (char *)malloc((sizeof(char)*in_length*2)+1);
+    if (digest == NULL) {
+        return NULL;
+    }
+    int index = 0;
+    for (int i = 0; i < in_length; i++) {
+        int c = in[i];
+        sprintf(hexbuf, "%02x", c);
+        digest[index++] = hexbuf[0];
+        digest[index++] = hexbuf[1];
+    }
+    return digest;
+}
