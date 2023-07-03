@@ -86,9 +86,9 @@ unsigned char *decrypt_ssl(unsigned char *key,
 
 
 /**
- * Compute a sha1 digest of the input. Return 1 on success, 0 on failure.
- * The function populates the **digest pointer using OPENSSL_malloc on it first,
- * so OPENSSL_free should be called on **digest when done with it. Include the
+ * Compute a sha1 digest of the input. Return an unsigned char* with the
+ * digest.  The function populates the digest using OPENSSL_malloc on it first,
+ * so OPENSSL_free should be called on digest when done with it. Include the
  * openssl/evp.h header and link with -lssl.
  */
 unsigned char *digest_sha1(unsigned char *in,
