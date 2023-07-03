@@ -274,11 +274,8 @@ void test_sha1(void) {
     unsigned char input[] = "This is my input";
     unsigned char *output = NULL;
     unsigned int outsize = 0;
-    if (digest_sha1(input, strlen((char *)input), &output, &outsize)) {
-        CU_ASSERT( 1 );
-    } else {
-        CU_ASSERT( 0 );
-    }
+    output = digest_sha1(input, strlen((char *)input), &outsize);
+    CU_ASSERT( output != NULL );
     printf("the base64 sha1 hash of '%s' is '%s'\n", input, base64_encode((const char *)output, outsize));
 }
 

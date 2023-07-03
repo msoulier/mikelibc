@@ -85,10 +85,15 @@ unsigned char *decrypt_ssl(unsigned char *key,
                            int input_size);
 
 
-int digest_sha1(unsigned char *in,
-                size_t in_length,
-                unsigned char **digest,
-                unsigned int *digest_len);
+/**
+ * Compute a sha1 digest of the input. Return 1 on success, 0 on failure.
+ * The function populates the **digest pointer using OPENSSL_malloc on it first,
+ * so OPENSSL_free should be called on **digest when done with it. Include the
+ * openssl/evp.h header and link with -lssl.
+ */
+unsigned char *digest_sha1(unsigned char *in,
+                           size_t in_length,
+                           unsigned int *digest_len);
 
 #ifdef __cplusplus
 }
