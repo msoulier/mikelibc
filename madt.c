@@ -40,17 +40,27 @@ const uint32_t GC_COUNT = 100;
 /*
  * Methods for the mqueue_t.
  */
-void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size) {
+void mqueue_init(mqueue_t *queue,
+                 uint32_t initial_size,
+                 uint32_t max_size,
+                 char *description)
+{
     queue->front = 0;
     queue->rear = -1;
     queue->alloc_size = initial_size;
     queue->max_size = max_size;
     queue->gc_run = GC_COUNT;
+    bzero(queue->description, QUEUE_NAME_SIZE);
+    if (description != NULL) {
+        strncpy(queue->description, description, QUEUE_NAME_SIZE);
+    }
     size_t data_size = queue->alloc_size * sizeof(void *);
-    mdbgf("mallocing %d bytes of memory for the mqueue\n", data_size);
+    mdbgf("%s: mallocing %d bytes of memory for the mqueue\n",
+        queue->description, data_size);
     queue->data = malloc(data_size);
     assert( queue->data != NULL );
 #ifdef MIKELIBC_THREADS
+    mdbgf("%s: initializing pthread primitives\n", queue->description);
     pthread_mutex_init(&(queue->mutex), NULL);
     pthread_cond_init(&(queue->full), NULL);
     pthread_cond_init(&(queue->empty), NULL);
@@ -68,14 +78,20 @@ void mqueue_destroy(mqueue_t *queue) {
 
 // Always enqueue to the end of the array, and grow if required.
 uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
-    mdbgf("enqueuing item, queue->current_size is %d\n", mqueue_size(queue));
-    if (queue->max_size > 0) {
+    mdbgf("%s: enqueuing item, queue->current_size is %d\n",
+        queue->description, mqueue_size(queue));
 #ifdef MIKELIBC_THREADS
-        pthread_mutex_lock(&(queue->mutex));
+    mdbgf("%s: locking mutex for enqueue\n", queue->description);
+    pthread_mutex_lock(&(queue->mutex));
+    mdbgf("%s: got the lock\n", queue->description);
+    if (queue->max_size > 0) {
         while (mqueue_size(queue) == queue->max_size) {
+            mdbgf("%s: queue at max size of %d - waiting\n",
+                queue->description, queue->max_size);
             pthread_cond_wait(&(queue->full), &(queue->mutex));
         }
 #else
+    if (queue->max_size > 0) {
         // Check for maximum size
         if (mqueue_size(queue) == queue->max_size) {
             return -1;
@@ -87,13 +103,14 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
     if (queue->rear == queue->alloc_size) {
         // Double the size.
         size_t data_size = queue->alloc_size * sizeof(void *);
-        mdbgf("realloc from %d to %d\n", data_size, data_size*2);
+        mdbgf("%s: realloc from %d to %d\n", queue->description, data_size, data_size*2);
         queue->data = realloc(queue->data, data_size*2);
         assert( queue->data != NULL );
         queue->alloc_size *= 2;
     }
     queue->data[queue->rear] = item;
 #ifdef MIKELIBC_THREADS
+    mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
@@ -101,11 +118,15 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
 }
 
 void *mqueue_dequeue(mqueue_t *queue) {
-    mdbgf("dequeueing item, queue->current_size is %d\n", mqueue_size(queue));
+    mdbgf("%s: dequeueing item, queue->current_size is %d\n",
+        queue->description, mqueue_size(queue));
     void *item;
 #ifdef MIKELIBC_THREADS
+    mdbgf("%s: locking mutex for dequeue\n", queue->description);
     pthread_mutex_lock(&(queue->mutex));
+    mdbgf("%s: got the lock\n", queue->description);
     while (mqueue_size(queue) == 0) {
+        mdbgf("%s: is empty, waiting\n", queue->description);
         pthread_cond_wait(&(queue->empty), &(queue->mutex));
     }
 #else
@@ -122,6 +143,7 @@ void *mqueue_dequeue(mqueue_t *queue) {
         queue->gc_run = GC_COUNT;
     }
 #ifdef MIKELIBC_THREADS
+    mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
     pthread_cond_signal(&(queue->full));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
@@ -135,8 +157,8 @@ uint32_t mqueue_size(mqueue_t *queue) {
 void mqueue_vacuum(mqueue_t *queue) {
     // Note: This runs inside of the acquired mutex if running
     // multi-threaded.
-    mdbgf("in mqueue_vacuum: queue->front is %d, queue->rear is %d\n",
-            queue->front, queue->rear);
+    mdbgf("%s: in mqueue_vacuum: queue->front is %d, queue->rear is %d\n",
+            queue->description, queue->front, queue->rear);
     if (queue->front == 0) {
         // Nothing to do.
         return;
@@ -145,9 +167,10 @@ void mqueue_vacuum(mqueue_t *queue) {
     void *dest = queue->data;
     void *src = queue->data + queue->front;
     size_t bytes2copy = sizeof(void *) * mqueue_size(queue);
-    mdbgf("moving %d bytes to fix slack\n", bytes2copy);
+    mdbgf("%s: moving %d bytes to fix slack\n", queue->description, bytes2copy);
     dest = memmove(dest, src, bytes2copy);
     queue->rear -= queue->front;
     queue->front = 0;
-    mdbgf("queue->front is now 0, queue->rear is now %d\n", queue->rear);
+    mdbgf("%s: queue->front is now 0, queue->rear is now %d\n",
+        queue->description, queue->rear);
 }

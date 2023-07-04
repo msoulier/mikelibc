@@ -123,6 +123,7 @@ void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
  * A thread-safe queue. Stores void* on the queue, you need to do
  * the casting. Only thread-safe if build with MIKELIBC_THREADS=1.
  */
+#define QUEUE_NAME_SIZE 128
 typedef struct {
     void **data;
     uint32_t front;
@@ -131,6 +132,7 @@ typedef struct {
     uint32_t max_size;
     uint32_t gc_run;
     uint32_t alloc_size;
+    char description[QUEUE_NAME_SIZE];
 #ifdef MIKELIBC_THREADS
     pthread_mutex_t mutex;
     pthread_cond_t full;
@@ -142,8 +144,13 @@ typedef struct {
  * Initialize a new mqueue. Takes the initial size, and an optional
  * maximum size. If max_size is 0, consider the maximum size to be
  * unlimited.
+ * The description string is to help identify the queue, and is copied into
+ * an internal buffer no larger than 128 bytes. This can be NULL.
  */
-void mqueue_init(mqueue_t *queue, uint32_t initial_size, uint32_t max_size);
+void mqueue_init(mqueue_t *queue,
+                 uint32_t initial_size,
+                 uint32_t max_size,
+                 char *description);
 
 /**
  * When done with an mqueue, clean up the memory used by it.
