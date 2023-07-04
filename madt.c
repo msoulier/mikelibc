@@ -37,6 +37,23 @@ void mbtree_int_inorder_traversal(mbtree_int_node_t *root) {
  */
 const uint32_t GC_COUNT = 100;
 
+// Internal version of mqueue_size, which assumes that the mutex is
+// already acquired.
+uint32_t mqueue_size_int(mqueue_t *queue) {
+    return queue->rear+1 - queue->front;
+}
+
+uint32_t mqueue_size(mqueue_t *queue) {
+#ifdef MIKELIBC_THREADS
+    pthread_mutex_lock(&(queue->mutex));
+#endif
+    uint32_t size = mqueue_size_int(queue);
+#ifdef MIKELIBC_THREADS
+    pthread_mutex_unlock(&(queue->mutex));
+#endif
+    return size;
+}
+
 /*
  * Methods for the mqueue_t.
  */
@@ -78,14 +95,13 @@ void mqueue_destroy(mqueue_t *queue) {
 
 // Always enqueue to the end of the array, and grow if required.
 uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
-    mdbgf("%s: enqueuing item, queue->current_size is %d\n",
-        queue->description, mqueue_size(queue));
+    mdbgf("%s: enqueuing item\n", queue->description);
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for enqueue\n", queue->description);
     pthread_mutex_lock(&(queue->mutex));
     mdbgf("%s: got the lock\n", queue->description);
     if (queue->max_size > 0) {
-        while (mqueue_size(queue) == queue->max_size) {
+        while (mqueue_size_int(queue) == queue->max_size) {
             mdbgf("%s: queue at max size of %d - waiting\n",
                 queue->description, queue->max_size);
             pthread_cond_wait(&(queue->full), &(queue->mutex));
@@ -93,7 +109,7 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
 #else
     if (queue->max_size > 0) {
         // Check for maximum size
-        if (mqueue_size(queue) == queue->max_size) {
+        if (mqueue_size_int(queue) == queue->max_size) {
             return -1;
         }
 #endif
@@ -111,7 +127,7 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
     queue->data[queue->rear] = item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
-    uint32_t size = mqueue_size(queue);
+    uint32_t size = mqueue_size_int(queue);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
@@ -119,19 +135,18 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
 }
 
 void *mqueue_dequeue(mqueue_t *queue) {
-    mdbgf("%s: dequeueing item, queue->current_size is %d\n",
-        queue->description, mqueue_size(queue));
+    mdbgf("%s: dequeueing item\n", queue->description)
     void *item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for dequeue\n", queue->description);
     pthread_mutex_lock(&(queue->mutex));
     mdbgf("%s: got the lock\n", queue->description);
-    while (mqueue_size(queue) == 0) {
+    while (mqueue_size_int(queue) == 0) {
         mdbgf("%s: is empty, waiting\n", queue->description);
         pthread_cond_wait(&(queue->empty), &(queue->mutex));
     }
 #else
-    if (mqueue_size(queue) == 0) {
+    if (mqueue_size_int(queue) == 0) {
         return NULL;
     }
 #endif
@@ -149,10 +164,6 @@ void *mqueue_dequeue(mqueue_t *queue) {
     pthread_mutex_unlock(&(queue->mutex));
 #endif
     return item;
-}
-
-uint32_t mqueue_size(mqueue_t *queue) {
-    return queue->rear+1 - queue->front;
 }
 
 void mqueue_vacuum(mqueue_t *queue) {
