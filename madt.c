@@ -111,10 +111,11 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
     queue->data[queue->rear] = item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
+    uint32_t size = mqueue_size(queue);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
-    return mqueue_size(queue);
+    return size;
 }
 
 void *mqueue_dequeue(mqueue_t *queue) {
