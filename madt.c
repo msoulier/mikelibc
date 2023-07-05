@@ -62,6 +62,11 @@ void mqueue_init(mqueue_t *queue,
                  uint64_t max_size,
                  char *description)
 {
+    mdbgf("%s: mqueue_init: initial_size %d and max_size %d\n",
+        description, initial_size, max_size);
+    if (initial_size < 1) {
+        initial_size = 1;
+    }
     queue->front = 0;
     queue->rear = -1;
     queue->alloc_size = initial_size;

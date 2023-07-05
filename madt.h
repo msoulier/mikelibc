@@ -143,7 +143,7 @@ typedef struct {
 /**
  * Initialize a new mqueue. Takes the initial size, and an optional
  * maximum size. If max_size is 0, consider the maximum size to be
- * unlimited.
+ * unlimited. The minimum initial_size is 1.
  * The description string is to help identify the queue, and is copied into
  * an internal buffer no larger than 128 bytes. This can be NULL.
  */
