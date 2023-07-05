@@ -126,7 +126,7 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
     }
     queue->data[queue->rear] = item;
 #ifdef MIKELIBC_THREADS
-    mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
+    mdbgf("%s: signaling empty cond and releasing mutex\n", queue->description);
     uint32_t size = mqueue_size_int(queue);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
@@ -159,7 +159,7 @@ void *mqueue_dequeue(mqueue_t *queue) {
         queue->gc_run = GC_COUNT;
     }
 #ifdef MIKELIBC_THREADS
-    mdbgf("%s: signaling cond and releasing mutex\n", queue->description);
+    mdbgf("%s: signaling full cond and releasing mutex\n", queue->description);
     pthread_cond_signal(&(queue->full));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
@@ -173,12 +173,13 @@ void mqueue_vacuum(mqueue_t *queue) {
             queue->description, queue->front, queue->rear);
     if (queue->front == 0) {
         // Nothing to do.
+        mdbgf("%s: nothing to do\n", queue->description);
         return;
     }
     // Converting a void** to a void* for memmove.
     void *dest = queue->data;
     void *src = queue->data + queue->front;
-    size_t bytes2copy = sizeof(void *) * mqueue_size(queue);
+    size_t bytes2copy = sizeof(void *) * mqueue_size_int(queue);
     mdbgf("%s: moving %d bytes to fix slack\n", queue->description, bytes2copy);
     dest = memmove(dest, src, bytes2copy);
     queue->rear -= queue->front;
