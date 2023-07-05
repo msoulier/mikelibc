@@ -126,12 +126,12 @@ void mbtree_int_inorder_traversal(mbtree_int_node_t *root);
 #define QUEUE_NAME_SIZE 128
 typedef struct {
     void **data;
-    uint32_t front;
-    uint32_t rear;
-    uint32_t current_size;
-    uint32_t max_size;
-    uint32_t gc_run;
-    uint32_t alloc_size;
+    uint64_t front;
+    uint64_t rear;
+    uint64_t current_size;
+    uint64_t max_size;
+    uint64_t gc_run;
+    uint64_t alloc_size;
     char description[QUEUE_NAME_SIZE];
 #ifdef MIKELIBC_THREADS
     pthread_mutex_t mutex;
@@ -148,8 +148,8 @@ typedef struct {
  * an internal buffer no larger than 128 bytes. This can be NULL.
  */
 void mqueue_init(mqueue_t *queue,
-                 uint32_t initial_size,
-                 uint32_t max_size,
+                 uint64_t initial_size,
+                 uint64_t max_size,
                  char *description);
 
 /**
@@ -163,7 +163,7 @@ void mqueue_destroy(mqueue_t *queue);
  * variable until there is room. If not multi-threaded, return -1.
  * Return the new queue count on success.
  */
-uint32_t mqueue_enqueue(mqueue_t *queue, void *item);
+uint64_t mqueue_enqueue(mqueue_t *queue, void *item);
 
 /**
  * Dequeue a void* from the end of the queue, if anything. If we are at
@@ -177,7 +177,7 @@ void *mqueue_dequeue(mqueue_t *queue);
  * Return the current size of the queue, in the number of items
  * it is holding.
  */
-uint32_t mqueue_size(mqueue_t *queue);
+uint64_t mqueue_size(mqueue_t *queue);
 
 /**
  * The queue is wasteful of memory in the name of performance. As items are

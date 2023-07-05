@@ -35,19 +35,19 @@ void mbtree_int_inorder_traversal(mbtree_int_node_t *root) {
  * The number of dequeue operations on the queue that are done before
  * performing a vacuum operation to reclaim memory.
  */
-const uint32_t GC_COUNT = 100;
+const uint64_t GC_COUNT = 100;
 
 // Internal version of mqueue_size, which assumes that the mutex is
 // already acquired.
-uint32_t mqueue_size_int(mqueue_t *queue) {
+uint64_t mqueue_size_int(mqueue_t *queue) {
     return queue->rear+1 - queue->front;
 }
 
-uint32_t mqueue_size(mqueue_t *queue) {
+uint64_t mqueue_size(mqueue_t *queue) {
 #ifdef MIKELIBC_THREADS
     pthread_mutex_lock(&(queue->mutex));
 #endif
-    uint32_t size = mqueue_size_int(queue);
+    uint64_t size = mqueue_size_int(queue);
 #ifdef MIKELIBC_THREADS
     pthread_mutex_unlock(&(queue->mutex));
 #endif
@@ -58,8 +58,8 @@ uint32_t mqueue_size(mqueue_t *queue) {
  * Methods for the mqueue_t.
  */
 void mqueue_init(mqueue_t *queue,
-                 uint32_t initial_size,
-                 uint32_t max_size,
+                 uint64_t initial_size,
+                 uint64_t max_size,
                  char *description)
 {
     queue->front = 0;
@@ -94,7 +94,7 @@ void mqueue_destroy(mqueue_t *queue) {
 }
 
 // Always enqueue to the end of the array, and grow if required.
-uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
+uint64_t mqueue_enqueue(mqueue_t *queue, void *item) {
     mdbgf("%s: enqueuing item\n", queue->description);
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for enqueue\n", queue->description);
@@ -127,7 +127,7 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
     queue->data[queue->rear] = item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling empty cond and releasing mutex\n", queue->description);
-    uint32_t size = mqueue_size_int(queue);
+    uint64_t size = mqueue_size_int(queue);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
