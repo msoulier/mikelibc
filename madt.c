@@ -135,7 +135,7 @@ uint32_t mqueue_enqueue(mqueue_t *queue, void *item) {
 }
 
 void *mqueue_dequeue(mqueue_t *queue) {
-    mdbgf("%s: dequeueing item\n", queue->description)
+    mdbgf("%s: dequeueing item\n", queue->description);
     void *item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for dequeue\n", queue->description);
