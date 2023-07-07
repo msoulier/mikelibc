@@ -130,9 +130,9 @@ uint64_t mqueue_enqueue(mqueue_t *queue, void *item) {
         queue->alloc_size *= 2;
     }
     queue->data[queue->rear] = item;
+    uint64_t size = mqueue_size_int(queue);
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling empty cond and releasing mutex\n", queue->description);
-    uint64_t size = mqueue_size_int(queue);
     pthread_cond_signal(&(queue->empty));
     pthread_mutex_unlock(&(queue->mutex));
 #endif
