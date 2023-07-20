@@ -256,8 +256,8 @@ unsigned char *decrypt_ssl(unsigned char *key,
 }
 
 unsigned char *digest_sha1(unsigned char *in,
-                  size_t in_length,
-                  unsigned int *digest_len)
+                           size_t in_length,
+                           unsigned int *digest_len)
 {
     EVP_MD_CTX *mdctx;
     unsigned char *digest = NULL;
