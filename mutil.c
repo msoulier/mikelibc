@@ -299,7 +299,7 @@ char *hexdigest(unsigned char *in,
         return NULL;
     }
     int index = 0;
-    for (int i = 0; i < in_length; i++) {
+    for (size_t i = 0; i < in_length; i++) {
         int c = in[i];
         sprintf(hexbuf, "%02x", c);
         digest[index++] = hexbuf[0];
