@@ -1,6 +1,6 @@
 CC=gcc
 # Note: if using -std=c11 then -D_POSIX_C_SOURCE=200112L is required
-CFLAGS=-Wall -std=gnu11
+CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE
 OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o
 LIBS=
 MDEBUG=0
