@@ -256,8 +256,8 @@ unsigned char *decrypt_ssl(unsigned char *key,
 }
 
 unsigned char *digest_sha1(unsigned char *in,
-                  size_t in_length,
-                  unsigned int *digest_len)
+                           size_t in_length,
+                           unsigned int *digest_len)
 {
     EVP_MD_CTX *mdctx;
     unsigned char *digest = NULL;
@@ -299,7 +299,7 @@ char *hexdigest(unsigned char *in,
         return NULL;
     }
     int index = 0;
-    for (int i = 0; i < in_length; i++) {
+    for (size_t i = 0; i < in_length; i++) {
         int c = in[i];
         sprintf(hexbuf, "%02x", c);
         digest[index++] = hexbuf[0];
