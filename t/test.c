@@ -233,47 +233,32 @@ void test_encrypt_decrypt(void) {
     char *password = "this is a password";
     char *key = "e^SXXaI^W0dBoC688#GU";
     char *iv = "1234567";
-    printf("\nencrypting '%s'\n", password);
-    char *ciphertext = (char *)encrypt_ssl((unsigned char *)key,
-                                           (unsigned char *)iv,
-                                           NULL,
-                                           (unsigned char *)password,
-                                           strlen(password));
-    CU_ASSERT( ciphertext != NULL );
 
-    char *decrypted = (char *)decrypt_ssl((unsigned char *)key,
-                                          (unsigned char *)iv,
-                                          NULL,
-                                          (unsigned char *)ciphertext,
-                                          strlen(ciphertext));
-    CU_ASSERT( decrypted != NULL );
-    printf("\ndecrypted is '%s'\n", decrypted);
+    char *plaintexts[] = {
+        "secret password", "another secret", "lorem ipsem",
+        "river soft", "deal rational", "innovation sport"
+        };
+    for (int i = 0; i < 6; ++i) {
+        printf("\nencrypting '%s'\n", plaintexts[i]);
+        char *ciphertext = (char *)encrypt_ssl((unsigned char *)key,
+                                               (unsigned char *)iv,
+                                               EVP_aes_128_cfb8(),
+                                               (unsigned char *)plaintexts[i],
+                                               strlen(plaintexts[i]));
+        CU_ASSERT( ciphertext != NULL );
+        char *decrypted = (char *)decrypt_ssl((unsigned char *)key,
+                                              (unsigned char *)iv,
+                                              EVP_aes_128_cfb8(),
+                                              (unsigned char *)ciphertext,
+                                              strlen(ciphertext));
+        CU_ASSERT( decrypted != NULL );
+        printf("\ndecrypted is '%s'\n", decrypted);
 
-    CU_ASSERT( strcmp(password, decrypted) == 0 );
+        CU_ASSERT( strcmp(plaintexts[i], decrypted) == 0 );
 
-    free(ciphertext);
-    free(decrypted);
-
-    printf("\nencrypting '%s'\n", password);
-    ciphertext = (char *)encrypt_ssl((unsigned char *)key,
-                                     (unsigned char *)iv,
-                                     EVP_aes_128_cfb8(),
-                                     (unsigned char *)password,
-                                     strlen(password));
-    CU_ASSERT( ciphertext != NULL );
-
-    decrypted = (char *)decrypt_ssl((unsigned char *)key,
-                                    (unsigned char *)iv,
-                                    EVP_aes_128_cfb8(),
-                                    (unsigned char *)ciphertext,
-                                    strlen(ciphertext));
-    CU_ASSERT( decrypted != NULL );
-    printf("\ndecrypted is '%s'\n", decrypted);
-
-    CU_ASSERT( strcmp(password, decrypted) == 0 );
-
-    free(ciphertext);
-    free(decrypted);
+        free(ciphertext);
+        free(decrypted);
+    }
 }
 
 void test_sha1_hexdigest(void) {
