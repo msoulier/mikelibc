@@ -115,7 +115,10 @@ void test_fib(void) {
  * Test the dstnow function.
  */
 void test_dstnow(void) {
-    setenv("TZ", "UTC", 1);
+    // Sask doesn't observe DST
+    setenv("TZ", "America/Regina", 1);
+    tzset();
+    printf("dstnow for America/Regina is %d\n", dstnow());
     CU_ASSERT( dstnow() == 0 );
     // Difficult to reliably test this in other zones without
     // changing the system clock.
