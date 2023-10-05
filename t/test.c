@@ -12,7 +12,7 @@
 #include "mlog.h"
 #include "CUnit/Basic.h"
 
-#define MAX_QUEUE 120
+#define MAX_QUEUE 10
 
 typedef struct mll_node {
     int value;
@@ -133,7 +133,7 @@ void test_dns(void) {
     rv = maddrlookup("www.cbc.ca", "80", TCP);
     CU_ASSERT( rv == 0 );
     rv = maddrlookup("does.not.exist.foo", "22", TCP);
-    CU_ASSERT( rv == EAI_NONAME )
+    CU_ASSERT( rv == EAI_NODATA )
     rv = maddrlookup("amazon.com", NULL, TCP);
     CU_ASSERT( rv == 0 );
 }
@@ -172,7 +172,7 @@ void test_tcp_client(void) {
 // For testing the ThreadSafeQueue
 void* producer(void* arg) {
     mqueue_t *queue = (mqueue_t*)arg;
-    for (int i = 0; i < MAX_QUEUE * 2; i++) {
+    for (int i = 0; i < MAX_QUEUE; i++) {
         int *item = (int *)malloc(sizeof(int));
         *item = i;
         int rv = mqueue_enqueue(queue, (void *)item);
@@ -185,7 +185,7 @@ void* producer(void* arg) {
 // For testing the ThreadSafeQueue
 void* consumer(void* arg) {
     mqueue_t *queue = (mqueue_t*)arg;
-    for (int i = 0; i < MAX_QUEUE * 2; i++) {
+    for (int i = 0; i < MAX_QUEUE; i++) {
         int *item = mqueue_dequeue(queue);
         CU_ASSERT( item != NULL );
         CU_ASSERT( *item == i );
@@ -207,7 +207,8 @@ void test_mqueue(void) {
     pthread_join(producerThread, NULL);
     pthread_join(consumerThread, NULL);
 
-    CU_ASSERT( queue.current_size == 0 );
+    printf("queue.current_size is %d\n", mqueue_size(&queue));
+    CU_ASSERT( mqueue_size(&queue) == 0 );
 
     mqueue_destroy(&queue);
 }

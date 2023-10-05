@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -I..
+CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE -I..
 LIBS=-L.. -lmike -lcunit -lssl -lcrypto
 TESTS=
 MDEBUG=0

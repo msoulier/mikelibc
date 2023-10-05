@@ -128,7 +128,6 @@ typedef struct {
     void **data;
     uint64_t front;
     uint64_t rear;
-    uint64_t current_size;
     uint64_t max_size;
     uint64_t gc_run;
     uint64_t alloc_size;

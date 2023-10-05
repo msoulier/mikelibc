@@ -11,32 +11,6 @@
 #include "mdebug.h"
 #include "mlog.h"
 
-void paddr_error(int err) {
-    fprintf(stderr, "maddr: ");
-    switch (err) {
-        case EAI_NONAME:
-            fprintf(stderr, "Name or service not known.\n");
-            break;
-        case EAI_AGAIN:
-            fprintf(stderr, "Temporary error.\n");
-            break;
-        case EAI_FAIL:
-            fprintf(stderr, "Permanent failure.\n");
-            break;
-        case EAI_SOCKTYPE:
-            fprintf(stderr, "Requested socket type not supported.\n");
-            break;
-        case EAI_SERVICE:
-            fprintf(stderr, "Requested service not available.\n");
-            break;
-        case EAI_SYSTEM:
-            perror("System error");
-            break;
-        default:
-            fprintf(stderr, "Something bad happened. Not sure what.\n");
-    }
-}
-
 int maddrlookup(const char *host, const char *service, mSockType socktype) {
     int rv;
     struct addrinfo *infop = NULL;
@@ -53,7 +27,7 @@ int maddrlookup(const char *host, const char *service, mSockType socktype) {
     mdebugf("maddrlookup: host %s, service %s\n", host, service);
 
     if ((rv = getaddrinfo(host, service, &hints, &infop)) != 0) {
-        paddr_error(rv);
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         goto CLEANUP;
     }
     mdebugf("getaddrinfo rv was %d\n", rv);
@@ -237,7 +211,7 @@ connect_tcp_client(const char *address, const char *port) {
     hints.ai_protocol = IPPROTO_TCP;
 
     if ((rv = getaddrinfo(address, port, &hints, &infop)) != 0) {
-        paddr_error(rv);
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         rv = -1;
         goto CLEANUP;
     }
