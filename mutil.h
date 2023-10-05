@@ -97,8 +97,9 @@ unsigned char *digest_sha1(unsigned char *in,
 
 /**
  * Given the input string in, and the length of it in_length, dynamically
- * compute the hexidecimal of the characters in the input string, and return them
- * as a new string. The new string will be twice the length of the input string.
+ * compute the hexidecimal of the characters in the input string, and return
+ * them as a new string. The new string will be twice the length of the input
+ * string, and should be freed by the caller when done with it.
  */
 char *hexdigest(unsigned char *in,
                 size_t in_length);
