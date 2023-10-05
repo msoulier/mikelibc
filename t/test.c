@@ -233,6 +233,7 @@ void test_encrypt_decrypt(void) {
     char *password = "this is a password";
     char *key = "e^SXXaI^W0dBoC688#GU";
     char *iv = "1234567";
+    printf("\nencrypting '%s'\n", password);
     char *ciphertext = (char *)encrypt_ssl((unsigned char *)key,
                                            (unsigned char *)iv,
                                            NULL,
@@ -253,6 +254,7 @@ void test_encrypt_decrypt(void) {
     free(ciphertext);
     free(decrypted);
 
+    printf("\nencrypting '%s'\n", password);
     ciphertext = (char *)encrypt_ssl((unsigned char *)key,
                                      (unsigned char *)iv,
                                      EVP_aes_128_cfb8(),
