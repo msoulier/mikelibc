@@ -196,7 +196,7 @@ void test_mqueue(void) {
     pthread_t producerThread, consumerThread;
     mqueue_t queue;
 
-    mqueue_init(&queue, 5, MAX_QUEUE);
+    mqueue_init(&queue, 5, MAX_QUEUE, "test queue");
 
     pthread_create(&producerThread, NULL, producer, &queue);
     pthread_create(&consumerThread, NULL, consumer, &queue);
