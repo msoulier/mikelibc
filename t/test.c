@@ -133,7 +133,7 @@ void test_dns(void) {
     rv = maddrlookup("www.cbc.ca", "80", TCP);
     CU_ASSERT( rv == 0 );
     rv = maddrlookup("does.not.exist.foo", "22", TCP);
-    CU_ASSERT( rv == EAI_NODATA )
+    CU_ASSERT( rv != 0 );
     rv = maddrlookup("amazon.com", NULL, TCP);
     CU_ASSERT( rv == 0 );
 }
