@@ -232,10 +232,10 @@ void test_base64_decode(void) {
 void test_b64_enc_dec(void) {
     printf("test_b64_enc_dec\n");
     char *inputs[] = {
-        "one two three", "four five", "six seven\\ eight",
+        "foo", "one two three", "four five", "six seven\\ eight",
         "nine ten eleven twelve thirteen fourteen"
         };
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         printf("b64 encoding %s\n", inputs[i]);
         char *encoded = base64_encode(inputs[i], strlen(inputs[i]));
         char *decoded = base64_decode(encoded, strlen(encoded));

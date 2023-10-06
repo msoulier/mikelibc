@@ -164,6 +164,7 @@ char *base64_decode(const char *crypttext, size_t input_size) {
         mwarningf("base64_decode: expected %d bytes but got %d",
             plaintext_mem, bytes);
     }
+    plaintext[bytes] = '\0';
     return plaintext;
 }
 
