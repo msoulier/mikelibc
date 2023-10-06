@@ -207,7 +207,7 @@ void test_mqueue(void) {
     pthread_join(producerThread, NULL);
     pthread_join(consumerThread, NULL);
 
-    printf("queue.current_size is %d\n", mqueue_size(&queue));
+    printf("queue.current_size is %ld\n", mqueue_size(&queue));
     CU_ASSERT( mqueue_size(&queue) == 0 );
 
     mqueue_destroy(&queue);
@@ -216,7 +216,7 @@ void test_mqueue(void) {
 void test_base64_encode(void) {
     char *input = "Hello, World!";
     char *output = base64_encode(input, strlen(input));
-    printf("\nbase64 of %s is '%s'\n", input, output);
+    printf("base64 of %s is '%s'\n", input, output);
     CU_ASSERT( output != NULL );
     CU_ASSERT( strcmp((char *)output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
     free(output);
@@ -225,12 +225,28 @@ void test_base64_encode(void) {
 void test_base64_decode(void) {
     char *input = "SGVsbG8sIFdvcmxkIQ==";
     char *output = base64_decode(input, strlen(input));
-    printf("\nbase64_decode of %s is %s", input, output);
+    printf("base64_decode of %s is %s", input, output);
     free(output);
 }
 
+void test_b64_enc_dec(void) {
+    printf("test_b64_enc_dec\n");
+    char *inputs[] = {
+        "one two three", "four five", "six seven\\ eight",
+        "nine ten eleven twelve thirteen fourteen"
+        };
+    for (int i = 0; i < 4; ++i) {
+        printf("b64 encoding %s\n", inputs[i]);
+        char *encoded = base64_encode(inputs[i], strlen(inputs[i]));
+        char *decoded = base64_decode(encoded, strlen(encoded));
+        printf("encoded to %s, decoded to %s\n", encoded, decoded);
+        CU_ASSERT( strcmp(decoded, inputs[i]) == 0 );
+        free(encoded);
+        free(decoded);
+    }
+}
+
 void test_encrypt_decrypt(void) {
-    char *password = "this is a password";
     char *key = "e^SXXaI^W0dBoC688#GU";
     char *iv = "1234567";
 
@@ -239,7 +255,7 @@ void test_encrypt_decrypt(void) {
         "river soft", "deal rational", "innovation sport"
         };
     for (int i = 0; i < 6; ++i) {
-        printf("\nencrypting '%s'\n", plaintexts[i]);
+        printf("encrypting '%s'\n", plaintexts[i]);
         char *ciphertext = (char *)encrypt_ssl((unsigned char *)key,
                                                (unsigned char *)iv,
                                                EVP_aes_128_cfb8(),
@@ -252,7 +268,7 @@ void test_encrypt_decrypt(void) {
                                               (unsigned char *)ciphertext,
                                               strlen(ciphertext));
         CU_ASSERT( decrypted != NULL );
-        printf("\ndecrypted is '%s'\n", decrypted);
+        printf("decrypted is '%s'\n", decrypted);
 
         CU_ASSERT( strcmp(plaintexts[i], decrypted) == 0 );
 
@@ -323,6 +339,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
+         (NULL == CU_add_test(pSuite, "test of b64 encode/decode functions", test_b64_enc_dec)) ||
          (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
          (NULL == CU_add_test(pSuite, "test of sha1 and hexdigest function", test_sha1_hexdigest)) ||
          (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
