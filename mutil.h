@@ -48,9 +48,10 @@ char *base64_encode(const char *plaintext, size_t input_size);
 /*
  * Taking a crypttext string, populate a plaintext, base64-decoded version.
  * The resulting string is passed back. It is also heap allocated and should
- * be freed when done. Not thread-safe.
+ * be freed when done. Not thread-safe. Note that the output string could contain
+ * embedded NULL characters, so trust the output_size, and not string-handling functions.
  */
-char *base64_decode(const char *crypttext, size_t input_size);
+char *base64_decode(const char *crypttext, size_t input_size, size_t *output_size);
 
 /*
  * Taking a secret key and an initialization vector, plus the plaintext to
@@ -101,7 +102,7 @@ unsigned char *digest_sha1(unsigned char *in,
  * them as a new string. The new string will be twice the length of the input
  * string, and should be freed by the caller when done with it.
  */
-char *hexdigest(unsigned char *in,
+char *tohex(unsigned char *in,
                 size_t in_length);
 
 #ifdef __cplusplus

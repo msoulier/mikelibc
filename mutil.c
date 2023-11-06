@@ -148,18 +148,21 @@ char *base64_encode(const char *plaintext, size_t input_size) {
     return crypttext;
 }
 
-char *base64_decode(const char *crypttext, size_t input_size) {
+char *base64_decode(const char *crypttext, size_t input_size, size_t *output_size) {
     int plaintext_mem = 3*input_size/4;
     // +1 for terminating null that EVP_EncodeBlock adds
     char *plaintext = (char *)malloc(plaintext_mem+1);
+    mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
     int bytes = EVP_DecodeBlock((unsigned char*)plaintext,
                                 (unsigned char*)crypttext,
                                 input_size);
+    mdbgf("returned bytes of %d\n", bytes);
     if (bytes < 0) {
         merrorf("base64_decode: EVP_DecodeBlock returned an error");
         free(plaintext);
         return NULL;
     }
+    *output_size = bytes;
     if (bytes != plaintext_mem) {
         mwarningf("base64_decode: expected %d bytes but got %d",
             plaintext_mem, bytes);
@@ -289,22 +292,22 @@ CLEANUP:
     return digest;
 }
 
-char *hexdigest(unsigned char *in,
+char *tohex(unsigned char *in,
                 size_t in_length)
 {
     char hexbuf[3];
-    char *digest = NULL;
+    char *hexstring = NULL;
     // Should be x2 the input length.
-    digest = (char *)malloc((sizeof(char)*in_length*2)+1);
-    if (digest == NULL) {
+    hexstring = (char *)malloc((sizeof(char)*in_length*2)+1);
+    if (hexstring == NULL) {
         return NULL;
     }
     int index = 0;
     for (size_t i = 0; i < in_length; i++) {
         int c = in[i];
         sprintf(hexbuf, "%02x", c);
-        digest[index++] = hexbuf[0];
-        digest[index++] = hexbuf[1];
+        hexstring[index++] = hexbuf[0];
+        hexstring[index++] = hexbuf[1];
     }
-    return digest;
+    return hexstring;
 }

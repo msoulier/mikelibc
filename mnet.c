@@ -31,16 +31,6 @@ int maddrlookup(const char *host, const char *service, mSockType socktype) {
         goto CLEANUP;
     }
     mdebugf("getaddrinfo rv was %d\n", rv);
-#ifdef MDEBUG
-    struct addrinfo *current = NULL;
-    for (current = infop; current != NULL; current = current->ai_next) {
-        struct sockaddr_in *sa = (struct sockaddr_in *)current->ai_addr;
-        mdebugf("\n%s port: %d protocol: %d\n",
-           inet_ntoa(sa->sin_addr),
-           ntohs(sa->sin_port),
-           current->ai_protocol);
-    }
-#endif
 CLEANUP:
     mdebugf("CLEANUP: calling freeaddrinfo\n");
     if (infop != NULL)
