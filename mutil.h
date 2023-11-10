@@ -43,7 +43,7 @@ int popenRWE(int *rwepipe, const char *exe, const char *const args[]);
  * The resulting string is passed back. It is also heap allocated and should
  * be freed when done. Not thread-safe.
  */
-char *base64_encode(const char *plaintext, size_t input_size);
+char *base64_encode(const char *plaintext, size_t input_size, size_t *output_size);
 
 /*
  * Taking a crypttext string, populate a plaintext, base64-decoded version.

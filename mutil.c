@@ -129,7 +129,7 @@ error_in:
 	return -1;
 }
 
-char *base64_encode(const char *plaintext, size_t input_size) {
+char *base64_encode(const char *plaintext, size_t input_size, size_t *output_size) {
 	int crypttext_mem = 4*((input_size+2)/3);
     // +1 for terminating null that EVP_EncodeBlock adds
     char *crypttext = (char *)malloc(crypttext_mem+1);
@@ -145,6 +145,7 @@ char *base64_encode(const char *plaintext, size_t input_size) {
         mwarningf("base64_encode: expected %d bytes but got %d",
             crypttext_mem, bytes);
     }
+    *output_size = bytes;
     return crypttext;
 }
 
