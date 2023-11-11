@@ -129,13 +129,11 @@ error_in:
 	return -1;
 }
 
-char *base64_encode(const char *plaintext, size_t input_size, size_t *output_size) {
+char *base64_encode(const unsigned char *plaintext, size_t input_size, size_t *output_size) {
 	int crypttext_mem = 4*((input_size+2)/3);
     // +1 for terminating null that EVP_EncodeBlock adds
     char *crypttext = (char *)malloc(crypttext_mem+1);
-    int bytes = EVP_EncodeBlock((unsigned char*)crypttext,
-                                (unsigned char*)plaintext,
-                                input_size);
+    int bytes = EVP_EncodeBlock((unsigned char *)crypttext, plaintext, input_size);
     if (bytes < 0) {
         merrorf("base64_encode: EVP_EncodeBlock returned an error");
         free(crypttext);
@@ -149,14 +147,12 @@ char *base64_encode(const char *plaintext, size_t input_size, size_t *output_siz
     return crypttext;
 }
 
-char *base64_decode(const char *crypttext, size_t input_size, size_t *output_size) {
+unsigned char *base64_decode(const char *crypttext, size_t input_size, size_t *output_size) {
     int plaintext_mem = 3*input_size/4;
     // +1 for terminating null that EVP_EncodeBlock adds
-    char *plaintext = (char *)malloc(plaintext_mem+1);
+    unsigned char *plaintext = (unsigned char *)malloc(plaintext_mem+1);
     mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
-    int bytes = EVP_DecodeBlock((unsigned char*)plaintext,
-                                (unsigned char*)crypttext,
-                                input_size);
+    int bytes = EVP_DecodeBlock(plaintext, (unsigned char *)crypttext, input_size);
     mdbgf("returned bytes of %d\n", bytes);
     if (bytes < 0) {
         merrorf("base64_decode: EVP_DecodeBlock returned an error");
@@ -168,7 +164,6 @@ char *base64_decode(const char *crypttext, size_t input_size, size_t *output_siz
         mwarningf("base64_decode: expected %d bytes but got %d",
             plaintext_mem, bytes);
     }
-    plaintext[bytes] = '\0';
     return plaintext;
 }
 

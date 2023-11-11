@@ -215,17 +215,17 @@ void test_mqueue(void) {
 
 void test_base64_encode(void) {
     size_t output_size;
-    char *input = "Hello, World!";
+    unsigned char *input = "Hello, World!";
     char *output = base64_encode(input, strlen(input), &output_size);
     printf("base64 of %s is '%s'\n", input, output);
     CU_ASSERT( output != NULL );
-    CU_ASSERT( strcmp((char *)output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
+    CU_ASSERT( strcmp(output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
     free(output);
 }
 
 void test_base64_decode(void) {
     size_t output_size = 0;
-    char *input = "SGVsbG8sIFdvcmxkIQ==";
+    unsigned char *input = "SGVsbG8sIFdvcmxkIQ==";
     char *output = base64_decode(input, strlen(input), &output_size);
     free(output);
 }
@@ -241,9 +241,14 @@ void test_b64_enc_dec(void) {
         printf("b64 encoding %s\n", inputs[i]);
         char *encoded = base64_encode(inputs[i], strlen(inputs[i]), &output_size);
         char *decoded = base64_decode(encoded, strlen(encoded), &output_size);
-        CU_ASSERT( strcmp(decoded, inputs[i]) == 0 );
+        if (decoded == NULL) {
+            fprintf(stderr, "FAIL: base64_decode returned NULL\n");
+        } else {
+            decoded[output_size] = '\0';
+            CU_ASSERT( strcmp(decoded, inputs[i]) == 0 );
+            free(decoded);
+        }
         free(encoded);
-        free(decoded);
     }
 }
 
