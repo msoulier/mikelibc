@@ -130,41 +130,41 @@ error_in:
 }
 
 char *base64_encode(const unsigned char *data, size_t input_size, size_t *output_size) {
-	int crypttext_mem = 4*((input_size+2)/3);
+	int b64string_mem = 4*((input_size+2)/3);
     // +1 for terminating null that EVP_EncodeBlock adds
-    char *crypttext = (char *)malloc(crypttext_mem+1);
-    int bytes = EVP_EncodeBlock((unsigned char *)crypttext, data, input_size);
+    char *b64string = (char *)malloc(b64string_mem+1);
+    int bytes = EVP_EncodeBlock((unsigned char *)b64string, data, input_size);
     if (bytes < 0) {
         merrorf("base64_encode: EVP_EncodeBlock returned an error");
-        free(crypttext);
+        free(b64string);
         return NULL;
     }
-    if (crypttext_mem != bytes) {
+    if (b64string_mem != bytes) {
         mwarningf("base64_encode: expected %d bytes but got %d",
-            crypttext_mem, bytes);
+            b64string_mem, bytes);
     }
     *output_size = bytes;
-    return crypttext;
+    return b64string;
 }
 
 unsigned char *base64_decode(const char *b64string, size_t input_size, size_t *output_size) {
-    int plaintext_mem = 3*input_size/4;
+    int data_mem = 3*input_size/4;
     // +1 for terminating null that EVP_EncodeBlock adds
-    unsigned char *plaintext = (unsigned char *)malloc(plaintext_mem+1);
+    unsigned char *data = (unsigned char *)malloc(data_mem+1);
     mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
-    int bytes = EVP_DecodeBlock(plaintext, (unsigned char *)b64string, input_size);
+    int bytes = EVP_DecodeBlock(data, (unsigned char *)b64string, input_size);
     mdbgf("returned bytes of %d\n", bytes);
     if (bytes < 0) {
         merrorf("base64_decode: EVP_DecodeBlock returned an error");
-        free(plaintext);
+        free(data);
         return NULL;
     }
     *output_size = bytes;
-    if (bytes != plaintext_mem) {
+    if (bytes != data_mem) {
         mwarningf("base64_decode: expected %d bytes but got %d",
-            plaintext_mem, bytes);
+            data_mem, bytes);
     }
-    return plaintext;
+    return data;
 }
 
 unsigned char *encrypt_ssl(unsigned char *key,

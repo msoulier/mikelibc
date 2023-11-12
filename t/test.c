@@ -215,8 +215,8 @@ void test_mqueue(void) {
 
 void test_base64_encode(void) {
     size_t output_size;
-    unsigned char *input = "Hello, World!";
-    char *output = base64_encode(input, strlen(input), &output_size);
+    char *input = "Hello, World!";
+    char *output = base64_encode((unsigned char*)input, strlen(input), &output_size);
     printf("base64 of %s is '%s'\n", input, output);
     CU_ASSERT( output != NULL );
     CU_ASSERT( strcmp(output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
@@ -225,8 +225,8 @@ void test_base64_encode(void) {
 
 void test_base64_decode(void) {
     size_t output_size = 0;
-    unsigned char *input = "SGVsbG8sIFdvcmxkIQ==";
-    char *output = base64_decode(input, strlen(input), &output_size);
+    char *input = "SGVsbG8sIFdvcmxkIQ==";
+    unsigned char *output = base64_decode(input, strlen(input), &output_size);
     free(output);
 }
 
@@ -237,15 +237,22 @@ void test_b64_enc_dec(void) {
         "nine ten eleven twelve thirteen fourteen"
         };
     for (int i = 0; i < 5; ++i) {
+        size_t orig_size = 0;
+        size_t result_size = 0;
         size_t output_size = 0;
         printf("b64 encoding %s\n", inputs[i]);
-        char *encoded = base64_encode(inputs[i], strlen(inputs[i]), &output_size);
-        char *decoded = base64_decode(encoded, strlen(encoded), &output_size);
+        orig_size = strlen(inputs[i]);
+        char *encoded = base64_encode((unsigned char *)inputs[i], strlen(inputs[i]), &output_size);
+        unsigned char *decoded = base64_decode(encoded, strlen(encoded), &output_size);
         if (decoded == NULL) {
             fprintf(stderr, "FAIL: base64_decode returned NULL\n");
         } else {
             decoded[output_size] = '\0';
-            CU_ASSERT( strcmp(decoded, inputs[i]) == 0 );
+            result_size = strlen((char *)decoded);
+            fprintf(stderr, "b64: orig_size %d / result_size %d\n",
+                orig_size, result_size);
+            CU_ASSERT( strcmp((char *)decoded, inputs[i]) == 0 );
+            CU_ASSERT( orig_size == result_size );
             free(decoded);
         }
         free(encoded);
@@ -290,7 +297,8 @@ void test_sha1_hexdigest(void) {
     size_t b64size = 0;
     output = digest_sha1(input, strlen((char *)input), &outsize);
     CU_ASSERT( output != NULL );
-    printf("the base64 sha1 hash of '%s' is '%s'\n", input, base64_encode((const char *)output, outsize, &b64size));
+    printf("the base64 sha1 hash of '%s' is '%s'\n",
+        input, base64_encode((const unsigned char *)output, outsize, &b64size));
     printf("the hexdigest of the sha1 hash is %s\n", tohex(output, outsize));
 }
 
