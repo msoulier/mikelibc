@@ -249,7 +249,7 @@ void test_b64_enc_dec(void) {
         } else {
             decoded[output_size] = '\0';
             result_size = strlen((char *)decoded);
-            fprintf(stderr, "b64: orig_size %d / result_size %d\n",
+            fprintf(stderr, "b64: orig_size %ld / result_size %ld\n",
                 orig_size, result_size);
             CU_ASSERT( strcmp((char *)decoded, inputs[i]) == 0 );
             CU_ASSERT( orig_size == result_size );
