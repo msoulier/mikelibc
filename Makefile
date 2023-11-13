@@ -21,7 +21,7 @@ ifeq ($(MTHREADS),1)
     CFLAGS += -DMIKELIBC_THREADS
 endif
 
-all: libmike.a
+all: libmike.a base64
 
 help:
 	@echo "MDEBUG is $(MDEBUG)"
@@ -29,6 +29,9 @@ help:
 
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
+
+base64: base64.c base64.h
+	$(CC) $(CFLAGS) -o base64 base64.c
 
 mikelib.o: mikelib.c mikelib.h
 	$(CC) $(CFLAGS) -c mikelib.c

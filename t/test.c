@@ -234,11 +234,10 @@ void test_b64_enc_dec(void) {
     printf("test_b64_enc_dec\n");
     char *inputs[] = {
         "foo", "one two three", "four five", "six seven\\ eight",
-        "nine ten eleven twelve thirteen fourteen"
+        "this is an input string"
         };
     for (int i = 0; i < 5; ++i) {
         size_t orig_size = 0;
-        size_t result_size = 0;
         size_t output_size = 0;
         printf("b64 encoding %s\n", inputs[i]);
         orig_size = strlen(inputs[i]);
@@ -248,11 +247,10 @@ void test_b64_enc_dec(void) {
             fprintf(stderr, "FAIL: base64_decode returned NULL\n");
         } else {
             decoded[output_size] = '\0';
-            result_size = strlen((char *)decoded);
             fprintf(stderr, "b64: orig_size %ld / result_size %ld\n",
-                orig_size, result_size);
+                orig_size, output_size);
             CU_ASSERT( strcmp((char *)decoded, inputs[i]) == 0 );
-            CU_ASSERT( orig_size == result_size );
+            CU_ASSERT( orig_size == output_size );
             free(decoded);
         }
         free(encoded);

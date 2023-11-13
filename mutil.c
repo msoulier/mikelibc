@@ -144,16 +144,26 @@ char *base64_encode(const unsigned char *data, size_t input_size, size_t *output
             b64string_mem, bytes);
     }
     *output_size = bytes;
+    printf("encode returning: '%s'\n", b64string);
     return b64string;
 }
 
 unsigned char *base64_decode(const char *b64string, size_t input_size, size_t *output_size) {
     int data_mem = 3*input_size/4;
-    // +1 for terminating null that EVP_EncodeBlock adds
-    unsigned char *data = (unsigned char *)malloc(data_mem+1);
+    unsigned char *data = (unsigned char *)malloc(data_mem);
     mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
     int bytes = EVP_DecodeBlock(data, (unsigned char *)b64string, input_size);
-    mdbgf("returned bytes of %d\n", bytes);
+    printf("returned bytes of %d\n", bytes);
+    // DEBUG temporary
+    printf("decoding:\n");
+    for (int i = 0; i < bytes; ++i) {
+        if (data[i] == '\0') {
+            printf("   %3d: NULL\n", i);
+        } else {
+            printf("   %3d: '%c'\n", i, data[i]);
+        }
+    }
+    // DEBUG temporary
     if (bytes < 0) {
         merrorf("base64_decode: EVP_DecodeBlock returned an error");
         free(data);
