@@ -1,7 +1,7 @@
 CC=gcc
 # Note: if using -std=c11 then -D_POSIX_C_SOURCE=200112L is required
 CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE
-OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o
+OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o base64.o
 LIBS=
 MDEBUG=0
 MTHREADS=1
@@ -21,7 +21,7 @@ ifeq ($(MTHREADS),1)
     CFLAGS += -DMIKELIBC_THREADS
 endif
 
-all: libmike.a base64
+all: libmike.a
 
 help:
 	@echo "MDEBUG is $(MDEBUG)"
@@ -30,8 +30,8 @@ help:
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
 
-base64: base64.c base64.h
-	$(CC) $(CFLAGS) -o base64 base64.c
+base64.o: base64.c base64.h
+	$(CC) $(CFLAGS) -c base64.c
 
 mikelib.o: mikelib.c mikelib.h
 	$(CC) $(CFLAGS) -c mikelib.c
@@ -61,6 +61,6 @@ doc:
 	doxygen Doxyfile
 
 clean:
-	rm -f *.a *.o core base64
+	rm -f *.a *.o core
 	rm -rf doc
 	(cd t && make clean)

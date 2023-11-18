@@ -129,7 +129,7 @@ error_in:
 	return -1;
 }
 
-char *base64_encode(const unsigned char *data, size_t input_size, size_t *output_size) {
+char *base64_encode_openssl(const unsigned char *data, size_t input_size, size_t *output_size) {
 	int b64string_mem = 4*((input_size+2)/3);
     // +1 for terminating null that EVP_EncodeBlock adds
     char *b64string = (char *)malloc(b64string_mem+1);
@@ -148,7 +148,7 @@ char *base64_encode(const unsigned char *data, size_t input_size, size_t *output
     return b64string;
 }
 
-unsigned char *base64_decode(const char *b64string, size_t input_size, size_t *output_size) {
+unsigned char *base64_decode_openssl(const char *b64string, size_t input_size, size_t *output_size) {
     int data_mem = 3*input_size/4;
     unsigned char *data = (unsigned char *)malloc(data_mem);
     mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
