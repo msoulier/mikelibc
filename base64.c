@@ -105,17 +105,14 @@ char *base64_encode(const unsigned char *data,
 
         output[j] = b64_alphabet[b64.one];
         output[j+1] = b64_alphabet[b64.two];
+        output[j+2] = b64_alphabet[b64.three];
+        output[j+3] = b64_alphabet[b64.four];
 
-        if (padding > 0) {
-            output[j+2] = '=';
-        } else {
-            output[j+2] = b64_alphabet[b64.three];
-        }
-
-        if (padding == 2) {
+        if (padding == 1) {
             output[j+3] = '=';
-        } else {
-            output[j+3] = b64_alphabet[b64.four];
+        } else if (padding == 2) {
+            output[j+2] = '=';
+            output[j+3] = '=';
         }
         i += 3;
         j += 4;
