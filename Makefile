@@ -61,6 +61,6 @@ doc:
 	doxygen Doxyfile
 
 clean:
-	rm -f *.a *.o core
+	rm -f *.a *.o core base64
 	rm -rf doc
 	(cd t && make clean)
