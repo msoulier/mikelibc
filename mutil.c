@@ -169,11 +169,31 @@ unsigned char *base64_decode_openssl(const char *b64string, size_t input_size, s
         free(data);
         return NULL;
     }
-    *output_size = bytes;
     if (bytes != data_mem) {
         mwarningf("base64_decode: expected %d bytes but got %d",
             data_mem, bytes);
     }
+    // Reduce the bytes returned by the number of padding bytes in the
+    // original encoded string.
+    if ((input_size > 0) && (b64string[input_size-1] == '=')) {
+        mdbgf("one = found at %d\n", input_size-1);
+        bytes--;
+    }
+    if ((input_size > 1) && (b64string[input_size-2] == '=')) {
+        mdbgf("another = found at %d\n", input_size-2);
+        bytes--;
+    }
+    // DEBUG temporary
+    mdbgf("decoding:\n");
+    for (int i = 0; i < bytes; ++i) {
+        if (data[i] == '\0') {
+            mdbgf("   %3d: NULL\n", i);
+        } else {
+            mdbgf("   %3d: '%c'\n", i, data[i]);
+        }
+    }
+    // DEBUG temporary
+    *output_size = bytes;
     return data;
 }
 
