@@ -10,7 +10,7 @@
 
 #include <openssl/evp.h>
 
-#include "base64.h"
+#include "mbase64.h"
 
 #ifdef __cplusplus
 extern "C" {
