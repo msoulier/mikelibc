@@ -1,7 +1,7 @@
 CC=gcc
 # Note: if using -std=c11 then -D_POSIX_C_SOURCE=200112L is required
 CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE
-OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o base64.o
+OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o mbase64.o
 LIBS=
 MDEBUG=0
 MTHREADS=1
@@ -30,14 +30,14 @@ help:
 libmike.a: $(OBJS)
 	ar rc libmike.a $(OBJS)
 
-base64.o: base64.c base64.h mdebug.h
-	$(CC) $(CFLAGS) -c base64.c
+mbase64.o: mbase64.c mbase64.h mdebug.h
+	$(CC) $(CFLAGS) -c mbase64.c
 
-mb64.o: mb64.c base64.h
+mb64.o: mb64.c mbase64.h
 	$(CC) $(CFLAGS) -c mb64.c
 
-mb64: base64.o mb64.o mdebug.o
-	$(CC) $(CFLAGS) -o mb64 base64.o mb64.o mdebug.o
+mb64: mbase64.o mb64.o mdebug.o
+	$(CC) $(CFLAGS) -o mb64 mbase64.o mb64.o mdebug.o
 
 mikelib.o: mikelib.c mikelib.h
 	$(CC) $(CFLAGS) -c mikelib.c
