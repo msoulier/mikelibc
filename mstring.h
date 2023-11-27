@@ -1,6 +1,10 @@
 #ifndef MSTRING_H
 #define MSTRING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Take a string a split on whitespace, returning an array of strings.
  * This array is dynamically allocated. After you are done with it,
@@ -19,5 +23,9 @@ char **msplit(char *input_string, const char * const separators);
  */
 void
 free_msplit(char **split_string);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

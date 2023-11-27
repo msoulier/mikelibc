@@ -6,9 +6,17 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 unsigned char *mbase64_decode(const char *b64string, size_t *output_size);
 
 char *mbase64_encode(const unsigned char *data,
                      size_t input_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

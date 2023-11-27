@@ -4,6 +4,10 @@
 #include "mdebug.h"
 #include "mlog.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Return a stack allocated buffer containing a version string.
  * This is currently only useful for debugging.
@@ -17,5 +21,9 @@ get_mikelib_version_s(void);
  */
 int *
 get_mikelib_version_i(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

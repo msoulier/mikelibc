@@ -9,6 +9,10 @@
 
 #include "mdebug.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * The following macros are for managing a linked list, implemented
  * through C structs that have a "next" pointer. It should work with
@@ -188,5 +192,9 @@ uint64_t mqueue_size(mqueue_t *queue);
  * is needed, this can be called.
  */
 void mqueue_vacuum(mqueue_t *queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

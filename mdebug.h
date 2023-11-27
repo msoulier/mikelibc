@@ -8,6 +8,10 @@
 extern pthread_mutex_t mdebug_mutex;
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* A simple software assertion that does not terminate the executable.
  * 0 is good, 1 is bad.
  */
@@ -25,6 +29,10 @@ dbg_printf(const char *fname, const int lineno, const char *fmt, ...);
 #define mdbgf(...) dbg_printf (__FILE__, __LINE__, __VA_ARGS__)
 #else
 #define mdbgf(...)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
