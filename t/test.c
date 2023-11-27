@@ -213,22 +213,6 @@ void test_mqueue(void) {
     mqueue_destroy(&queue);
 }
 
-void test_base64_encode(void) {
-    char *input = "Hello, World!";
-    char *output = base64_encode((unsigned char*)input, strlen(input));
-    printf("base64 of %s is '%s'\n", input, output);
-    CU_ASSERT( output != NULL );
-    CU_ASSERT( strcmp(output, "SGVsbG8sIFdvcmxkIQ==") == 0 );
-    free(output);
-}
-
-void test_base64_decode(void) {
-    size_t output_size = 0;
-    char *input = "SGVsbG8sIFdvcmxkIQ==";
-    unsigned char *output = base64_decode(input, &output_size);
-    free(output);
-}
-
 void test_b64_enc_dec(void) {
     printf("test_b64_enc_dec\n");
     char *inputs[] = {
@@ -240,10 +224,10 @@ void test_b64_enc_dec(void) {
         size_t output_size = 0;
         printf("b64 encoding %s\n", inputs[i]);
         orig_size = strlen(inputs[i]);
-        char *encoded = base64_encode((unsigned char *)inputs[i], strlen(inputs[i]));
-        unsigned char *decoded = base64_decode(encoded, &output_size);
+        char *encoded = mbase64_encode((unsigned char *)inputs[i], strlen(inputs[i]));
+        unsigned char *decoded = mbase64_decode(encoded, &output_size);
         if (decoded == NULL) {
-            fprintf(stderr, "FAIL: base64_decode returned NULL\n");
+            fprintf(stderr, "FAIL: mbase64_decode returned NULL\n");
         } else {
             decoded[output_size] = '\0';
             fprintf(stderr, "b64: orig_size %ld / result_size %ld\n",
@@ -322,7 +306,7 @@ void test_sha1_hexdigest(void) {
     output = digest_sha1(input, strlen((char *)input), &outsize);
     CU_ASSERT( output != NULL );
     printf("the base64 sha1 hash of '%s' is '%s'\n",
-        input, base64_encode((const unsigned char *)output, strlen((char *)output)));
+        input, mbase64_encode((const unsigned char *)output, strlen((char *)output)));
     printf("the hexdigest of the sha1 hash is %s\n", tohex(output, outsize));
 }
 
@@ -381,9 +365,7 @@ int main()
          (NULL == CU_add_test(pSuite, "test of b64 encode/decode functions", test_b64_enc_dec)) ||
          (NULL == CU_add_test(pSuite, "test of b64 encode/decode functions", test_b64_enc_dec_openssl)) ||
          (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
-         (NULL == CU_add_test(pSuite, "test of sha1 and hexdigest function", test_sha1_hexdigest)) ||
-         (NULL == CU_add_test(pSuite, "test of base64_encode", test_base64_encode)) ||
-         (NULL == CU_add_test(pSuite, "test of base64_decode", test_base64_decode))
+         (NULL == CU_add_test(pSuite, "test of sha1 and hexdigest function", test_sha1_hexdigest))
        )
     {
        CU_cleanup_registry();

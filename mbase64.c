@@ -79,8 +79,8 @@ int convert_to_b64(ORIG_OCTETS *orig, B64_BLOCK *b64) {
     return 0;
 }
 
-unsigned char *base64_decode(const char *b64string,
-                             size_t *output_size)
+unsigned char *mbase64_decode(const char *b64string,
+                              size_t *output_size)
 {
     size_t input_size = strlen(b64string);
     if (input_size % 4 != 0) {
@@ -91,10 +91,17 @@ unsigned char *base64_decode(const char *b64string,
     assert( output != NULL );
     int i = 0;
     int k = 0;
+    int padding = 0;
+    if (input_size > 3) {
+        // Then we have at least one block of 4. Check padding.
+        if (b64string[input_size-1] == '=') padding++;
+        if (b64string[input_size-2] == '=') padding++;
+    }
     while (i < input_size) {
         // Map 4 chars
         B64_BLOCK b64 = {0, 0, 0, 0};
         ORIG_OCTETS orig = {0, 0, 0};
+        // Loop over the B64_BLOCK struct fields to keep the code simple.
         uint8_t *pb64 = (uint8_t *)&b64;
         for (int j = 0; j < 4; ++j) {
             unsigned char c = b64string[i+j];
@@ -109,12 +116,13 @@ unsigned char *base64_decode(const char *b64string,
         k += 3;
     }
     *output_size = k;
+    *output_size -= padding;
 
     return output;
 }
 
-char *base64_encode(const unsigned char *data,
-                    size_t input_size)
+char *mbase64_encode(const unsigned char *data,
+                     size_t input_size)
 {
     ORIG_OCTETS orig;
     B64_BLOCK b64;

@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-unsigned char *base64_decode(const char *b64string, size_t *output_size);
+unsigned char *mbase64_decode(const char *b64string, size_t *output_size);
 
-char *base64_encode(const unsigned char *data,
-                    size_t input_size);
+char *mbase64_encode(const unsigned char *data,
+                     size_t input_size);
 
 #endif
