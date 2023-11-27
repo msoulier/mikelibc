@@ -73,6 +73,8 @@ char **msplit(char *input_string, const char * const separators) {
                 strncpy(split_array[nwords],
                         input_string+i-word_length,
                         word_length);
+                mdebugf("putting a NULL at position %d\n", word_length);
+                split_array[nwords][word_length] = '\0';
                 nwords++;
             }
         } else if (! inword) {
