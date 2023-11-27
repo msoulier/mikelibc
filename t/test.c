@@ -251,8 +251,8 @@ void test_b64_enc_dec_openssl(void) {
         size_t output_size = 0;
         printf("b64ssl encoding %s\n", inputs[i]);
         orig_size = strlen(inputs[i]);
-        char *encoded = base64_encode_openssl((unsigned char *)inputs[i], strlen(inputs[i]), &output_size);
-        unsigned char *decoded = base64_decode_openssl(encoded, strlen(encoded), &output_size);
+        char *encoded = base64_encode_openssl((unsigned char *)inputs[i], strlen(inputs[i]));
+        unsigned char *decoded = base64_decode_openssl(encoded, &output_size);
         if (decoded == NULL) {
             fprintf(stderr, "FAIL: base64_decode returned NULL\n");
         } else {

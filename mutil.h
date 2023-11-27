@@ -45,7 +45,7 @@ int popenRWE(int *rwepipe, const char *exe, const char *const args[]);
  * data. The resulting string is passed back. It is also heap allocated and
  * should be freed when done. Not thread-safe. Returns NULL on error.
  */
-char *base64_encode_openssl(const unsigned char *data, size_t input_size, size_t *output_size);
+char *base64_encode_openssl(const unsigned char *data, size_t input_size);
 
 /*
  * Taking a base64-encoded string, populate an unsigned char* of decoded data.
@@ -54,7 +54,7 @@ char *base64_encode_openssl(const unsigned char *data, size_t input_size, size_t
  * embedded NULL characters, so trust the output_size, and not string-handling
  * functions. Returns NULL on error.
  */
-unsigned char *base64_decode_openssl(const char *b64string, size_t input_size, size_t *output_size);
+unsigned char *base64_decode_openssl(const char *b64string, size_t *output_size);
 
 /*
  * Taking a secret key and an initialization vector, plus the plaintext to
