@@ -8,7 +8,7 @@
 #include "madt.h"
 #include "mnet.h"
 #include "mdebug.h"
-#include "mstring.h"
+#include "mstr.h"
 #include "mlog.h"
 #include "CUnit/Basic.h"
 

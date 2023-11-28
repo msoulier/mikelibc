@@ -5,6 +5,7 @@
 
 #include "mdebug.h"
 #include "mlog.h"
+#include "mstr.h"
 
 #define SPLIT_SIZE_INITIAL 8
 #define SPLIT_GROW_FACTOR 2
@@ -113,5 +114,3 @@ free_msplit(char **split_string) {
     mdebugf("free_msplit: freeing main array\n");
     free(split_string);
 }
-
-#include "mstring.h"

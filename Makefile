@@ -1,7 +1,7 @@
 CC=gcc
 # Note: if using -std=c11 then -D_POSIX_C_SOURCE=200112L is required
 CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE
-OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstring.o mbase64.o
+OBJS=mikelib.o mdebug.o mlog.o mutil.o madt.o mnet.o mstr.o mbase64.o
 LIBS=
 MDEBUG=0
 MTHREADS=1
@@ -51,8 +51,8 @@ mlog.o: mlog.c mlog.h
 mutil.o: mutil.c mutil.h
 	$(CC) $(CFLAGS) -c mutil.c
 
-mstring.o: mstring.c mstring.h
-	$(CC) $(CFLAGS) -c mstring.c
+mstr.o: mstr.c mstr.h
+	$(CC) $(CFLAGS) -c mstr.c
 
 madt.o: madt.c madt.h
 	$(CC) $(CFLAGS) -c madt.c
