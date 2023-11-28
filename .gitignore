@@ -3,3 +3,4 @@
 *.a
 libtai-0.60/*
 t/test
+mb64
