@@ -197,10 +197,10 @@ unsigned char *base64_decode_openssl(const char *b64string, size_t *output_size)
     return data;
 }
 
-unsigned char *encrypt_ssl(unsigned char *key,
-                           unsigned char *iv, 
+unsigned char *encrypt_ssl(const unsigned char *key,
+                           const unsigned char *iv,
                            const EVP_CIPHER *cipher_type,
-                           unsigned char *plaintext,
+                           const unsigned char *plaintext,
                            int input_size)
 {
     int outlen = 0;
@@ -241,10 +241,10 @@ unsigned char *encrypt_ssl(unsigned char *key,
     return (unsigned char *)crypttext;
 }
 
-unsigned char *decrypt_ssl(unsigned char *key,
-                           unsigned char *iv, 
+unsigned char *decrypt_ssl(const unsigned char *key,
+                           const unsigned char *iv,
                            const EVP_CIPHER *cipher_type,
-                           unsigned char *ciphertext,
+                           const unsigned char *ciphertext,
                            int input_size)
 {
     int outlen = 0;

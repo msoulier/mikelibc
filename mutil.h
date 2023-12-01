@@ -66,10 +66,10 @@ unsigned char *base64_decode_openssl(const char *b64string, size_t *output_size)
  * See EVP_CIPHER(3ssl) for all cipher types.
  * If cipher_type is NULL, EVP_aes_256_cfb8() will be used.
  */
-unsigned char *encrypt_ssl(unsigned char *key,
-                           unsigned char *iv, 
+unsigned char *encrypt_ssl(const unsigned char *key,
+                           const unsigned char *iv,
                            const EVP_CIPHER *cipher_type,
-                           unsigned char *plaintext,
+                           const unsigned char *plaintext,
                            int input_size);
 
 /*
@@ -82,10 +82,10 @@ unsigned char *encrypt_ssl(unsigned char *key,
  * See EVP_CIPHER(3ssl) for all cipher types.
  * If cipher_type is NULL, EVP_aes_256_cfb8() will be used.
  */
-unsigned char *decrypt_ssl(unsigned char *key,
-                           unsigned char *iv, 
+unsigned char *decrypt_ssl(const unsigned char *key,
+                           const unsigned char *iv,
                            const EVP_CIPHER *cipher_type,
-                           unsigned char *ciphertext,
+                           const unsigned char *ciphertext,
                            int input_size);
 
 
