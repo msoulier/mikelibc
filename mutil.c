@@ -153,17 +153,6 @@ unsigned char *base64_decode_openssl(const char *b64string, size_t *output_size)
     unsigned char *data = (unsigned char *)malloc(data_mem);
     mdbgf("base64_decode: calling EVP_DecodeBlock with size %d\n", input_size);
     int bytes = EVP_DecodeBlock(data, (unsigned char *)b64string, input_size);
-    printf("returned bytes of %d\n", bytes);
-    // DEBUG temporary
-    printf("decoding:\n");
-    for (int i = 0; i < bytes; ++i) {
-        if (data[i] == '\0') {
-            printf("   %3d: NULL\n", i);
-        } else {
-            printf("   %3d: '%c'\n", i, data[i]);
-        }
-    }
-    // DEBUG temporary
     if (bytes < 0) {
         merrorf("base64_decode: EVP_DecodeBlock returned an error");
         free(data);
@@ -183,16 +172,6 @@ unsigned char *base64_decode_openssl(const char *b64string, size_t *output_size)
         mdbgf("another = found at %d\n", input_size-2);
         bytes--;
     }
-    // DEBUG temporary
-    mdbgf("decoding:\n");
-    for (int i = 0; i < bytes; ++i) {
-        if (data[i] == '\0') {
-            mdbgf("   %3d: NULL\n", i);
-        } else {
-            mdbgf("   %3d: '%c'\n", i, data[i]);
-        }
-    }
-    // DEBUG temporary
     *output_size = bytes;
     return data;
 }
