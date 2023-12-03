@@ -95,7 +95,7 @@ unsigned char *decrypt_ssl(const unsigned char *key,
  * so OPENSSL_free should be called on digest when done with it. Include the
  * openssl/evp.h header and link with -lssl.
  */
-unsigned char *digest_sha1(unsigned char *in,
+unsigned char *digest_sha1(const unsigned char *in,
                            size_t in_length,
                            unsigned int *digest_len);
 

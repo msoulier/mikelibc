@@ -285,7 +285,7 @@ unsigned char *decrypt_ssl(const unsigned char *key,
     return (unsigned char *)plaintext;
 }
 
-unsigned char *digest_sha1(unsigned char *in,
+unsigned char *digest_sha1(const unsigned char *in,
                            size_t in_length,
                            unsigned int *digest_len)
 {
