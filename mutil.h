@@ -105,8 +105,8 @@ unsigned char *digest_sha1(const unsigned char *in,
  * them as a new string. The new string will be twice the length of the input
  * string, and should be freed by the caller when done with it.
  */
-char *tohex(unsigned char *in,
-                size_t in_length);
+char *tohex(const unsigned char *in,
+            size_t in_length);
 
 #ifdef __cplusplus
 }

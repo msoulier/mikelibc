@@ -318,8 +318,8 @@ CLEANUP:
     return digest;
 }
 
-char *tohex(unsigned char *in,
-                size_t in_length)
+char *tohex(const unsigned char *in,
+            size_t in_length)
 {
     char hexbuf[3];
     char *hexstring = NULL;
