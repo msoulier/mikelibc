@@ -143,7 +143,6 @@ char *base64_encode_openssl(const unsigned char *data, size_t input_size) {
         mwarningf("base64_encode: expected %d bytes but got %d",
             b64string_mem, bytes);
     }
-    printf("encode returning: '%s'\n", b64string);
     return b64string;
 }
 
