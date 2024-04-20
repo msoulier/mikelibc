@@ -1,5 +1,5 @@
 #!/bin/sh
 
-rm -rf build
-mkdir build || exit 1
-(cd build && cmake .. && make)
+rm -rf dist
+mkdir dist || exit 1
+(cd dist && cmake .. && make)
