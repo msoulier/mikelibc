@@ -1,6 +1,8 @@
 #ifndef MIKELIB_H
 #define MIKELIB_H
 
+#include "config.h"
+
 #include "mdebug.h"
 #include "mlog.h"
 

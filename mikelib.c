@@ -1,12 +1,22 @@
+#include <string.h>
 #include "mikelib.h"
 
-char mikelib_version_s[] = "1.0.5";
-int mikelib_version_i[] = { 1, 0, 5 };
+char version_buffer[256];
+int mikelib_version_i[] = {
+    MIKELIBC_VERSION_MAJOR,
+    MIKELIBC_VERSION_MINOR,
+    MIKELIBC_VERSION_PATCH
+};
 
 char *
 get_mikelib_version_s(void)
 {
-    return mikelib_version_s;
+    sprintf(version_buffer,
+            "%d.%d.%d",
+            MIKELIBC_VERSION_MAJOR,
+            MIKELIBC_VERSION_MINOR,
+            MIKELIBC_VERSION_PATCH);
+    return version_buffer;
 }
 
 int *
