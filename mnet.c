@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <sys/un.h>
 
 #include "mnet.h"
 #include "mdebug.h"
@@ -239,5 +240,47 @@ connect_tcp_client(const char *address, const char *port) {
 CLEANUP:
     if (infop != NULL)
         freeaddrinfo(infop);
+    return rv;
+}
+
+int
+connect_nix_streaming_client(const char *sockpath) {
+	int fd;
+	struct sockaddr_un addr;
+	int ret;
+	char buff[8192];
+	struct sockaddr_un from;
+	int len;
+    int rv;
+
+	if ((fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
+		perror("socket");
+        rv = -1;
+		goto CLEANUP;
+	}
+
+    /*
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strcpy(addr.sun_path, sockpath);
+    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        perror("bind");
+        rv = -1;
+        goto CLEANUP;
+    }
+    */
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strcpy(addr.sun_path, sockpath);
+    if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        perror("connect");
+        rv = -1;
+        goto CLEANUP;
+    }
+
+    rv = fd;
+
+CLEANUP:
     return rv;
 }

@@ -43,6 +43,12 @@ setup_tcp_server(char *address, int port, int backlog);
 int
 connect_tcp_client(const char *address, const char *port);
 
+/*
+ * Connect to a unix domain socket as a stream. Return the socket fd, or -1 on error.
+ */
+int
+connect_nix_streaming_client(const char *sockpath);
+
 #ifdef __cplusplus
 };
 #endif
