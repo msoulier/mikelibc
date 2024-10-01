@@ -2,7 +2,7 @@
 #define _MIKELIBC_ADT_H_
 
 #ifdef MIKELIBC_THREADS
-#include <pthread.h>
+#include <threads.h>
 #endif
 
 #include <stdint.h>
@@ -137,9 +137,9 @@ typedef struct {
     uint64_t alloc_size;
     char description[QUEUE_NAME_SIZE];
 #ifdef MIKELIBC_THREADS
-    pthread_mutex_t mutex;
-    pthread_cond_t full;
-    pthread_cond_t empty;
+    mtx_t mutex;
+    cnd_t full;
+    cnd_t empty;
 #endif
 } mqueue_t;
 

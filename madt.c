@@ -45,11 +45,11 @@ uint64_t mqueue_size_int(mqueue_t *queue) {
 
 uint64_t mqueue_size(mqueue_t *queue) {
 #ifdef MIKELIBC_THREADS
-    pthread_mutex_lock(&(queue->mutex));
+    mtx_lock(&(queue->mutex));
 #endif
     uint64_t size = mqueue_size_int(queue);
 #ifdef MIKELIBC_THREADS
-    pthread_mutex_unlock(&(queue->mutex));
+    mtx_unlock(&(queue->mutex));
 #endif
     return size;
 }
@@ -82,19 +82,19 @@ void mqueue_init(mqueue_t *queue,
     queue->data = malloc(data_size);
     assert( queue->data != NULL );
 #ifdef MIKELIBC_THREADS
-    mdbgf("%s: initializing pthread primitives\n", queue->description);
-    pthread_mutex_init(&(queue->mutex), NULL);
-    pthread_cond_init(&(queue->full), NULL);
-    pthread_cond_init(&(queue->empty), NULL);
+    mdbgf("%s: initializing thread primitives\n", queue->description);
+    mtx_init(&(queue->mutex), NULL);
+    cnd_init(&(queue->full), NULL);
+    cnd_init(&(queue->empty), NULL);
 #endif
 }
 
 void mqueue_destroy(mqueue_t *queue) {
     free(queue->data);
 #ifdef MIKELIBC_THREADS
-    pthread_mutex_destroy(&(queue->mutex));
-    pthread_cond_destroy(&(queue->full));
-    pthread_cond_destroy(&(queue->empty));
+    mtx_destroy(&(queue->mutex));
+    cnd_destroy(&(queue->full));
+    cnd_destroy(&(queue->empty));
 #endif
 }
 
@@ -103,13 +103,13 @@ uint64_t mqueue_enqueue(mqueue_t *queue, void *item) {
     mdbgf("%s: enqueuing item\n", queue->description);
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for enqueue\n", queue->description);
-    pthread_mutex_lock(&(queue->mutex));
+    mtx_lock(&(queue->mutex));
     mdbgf("%s: got the lock\n", queue->description);
     if (queue->max_size > 0) {
         while (mqueue_size_int(queue) == queue->max_size) {
             mdbgf("%s: queue at max size of %d - waiting\n",
                 queue->description, queue->max_size);
-            pthread_cond_wait(&(queue->full), &(queue->mutex));
+            cnd_wait(&(queue->full), &(queue->mutex));
         }
 #else
     if (queue->max_size > 0) {
@@ -133,8 +133,8 @@ uint64_t mqueue_enqueue(mqueue_t *queue, void *item) {
     uint64_t size = mqueue_size_int(queue);
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling empty cond and releasing mutex\n", queue->description);
-    pthread_cond_signal(&(queue->empty));
-    pthread_mutex_unlock(&(queue->mutex));
+    cnd_signal(&(queue->empty));
+    mtx_unlock(&(queue->mutex));
 #endif
     return size;
 }
@@ -144,11 +144,11 @@ void *mqueue_dequeue(mqueue_t *queue) {
     void *item;
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: locking mutex for dequeue\n", queue->description);
-    pthread_mutex_lock(&(queue->mutex));
+    mtx_lock(&(queue->mutex));
     mdbgf("%s: got the lock\n", queue->description);
     while (mqueue_size_int(queue) == 0) {
         mdbgf("%s: is empty, waiting\n", queue->description);
-        pthread_cond_wait(&(queue->empty), &(queue->mutex));
+        cnd_wait(&(queue->empty), &(queue->mutex));
     }
 #else
     if (mqueue_size_int(queue) == 0) {
@@ -165,8 +165,8 @@ void *mqueue_dequeue(mqueue_t *queue) {
     }
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: signaling full cond and releasing mutex\n", queue->description);
-    pthread_cond_signal(&(queue->full));
-    pthread_mutex_unlock(&(queue->mutex));
+    cnd_signal(&(queue->full));
+    mtx_unlock(&(queue->mutex));
 #endif
     return item;
 }
