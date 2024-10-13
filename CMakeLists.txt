@@ -19,4 +19,9 @@ target_include_directories(mike PUBLIC ${PROJECT_BINARY_DIR})
 add_executable(mb64
     mb64.c mbase64.c mdebug.c)
 
+add_executable(sha1
+    sha1.c mutil.c mlog.c)
+target_link_libraries(sha1
+    ssl crypto)
+
 set(CMAKE_C_COMPILER gcc)
