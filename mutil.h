@@ -108,6 +108,26 @@ unsigned char *digest_sha1(const unsigned char *in,
 char *tohex(const unsigned char *in,
             size_t in_length);
 
+/**
+ * Given the input string, populate the output string and length
+ * with the uri-encoded version of the string. Returns the output string
+ * or NULL on error. The returned string was allocated off the heap.
+ * You must free() it when you are done with it.
+ * Maximum size of the input is CURL_MAX_READ_SIZE. Maximum size of the
+ * return string is CURL_MAX_READ_SIZE*3. CURL_MAX_READ_SIZE is usually 10*1024*1024.
+ */
+ char *uriencode(const char *in, int *out_length);
+
+ /**
+  * Given the encoded input string, populate the output string and length
+  * with the url-decoded version of the string. Returns the output string
+  * or NULL on an error. The returned string was allocated off the heap,
+  * so you must free() it when you are done with it.
+ * Maximum size of the input is CURL_MAX_READ_SIZE*3. Maximum size of the
+ * return string is CURL_MAX_READ_SIZE. CURL_MAX_READ_SIZE is usually 10*1024*1024.
+  */
+ char *uridecode(const char *in, int *out_length);
+
 #ifdef __cplusplus
 }
 #endif

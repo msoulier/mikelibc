@@ -83,9 +83,9 @@ void mqueue_init(mqueue_t *queue,
     assert( queue->data != NULL );
 #ifdef MIKELIBC_THREADS
     mdbgf("%s: initializing thread primitives\n", queue->description);
-    mtx_init(&(queue->mutex), NULL);
-    cnd_init(&(queue->full), NULL);
-    cnd_init(&(queue->empty), NULL);
+    mtx_init(&(queue->mutex), mtx_plain);
+    cnd_init(&(queue->full));
+    cnd_init(&(queue->empty));
 #endif
 }
 

@@ -15,13 +15,22 @@ configure_file(config.h.in config.h)
 add_library(mike STATIC
     madt.c mbase64.c mdebug.c mikelib.c mlog.c mnet.c mstr.c mutil.c)
 target_include_directories(mike PUBLIC ${PROJECT_BINARY_DIR})
+target_link_libraries(mike)
+
+add_compile_definitions(MDEBUG=1 MIKELIBC_THREADS=1)
 
 add_executable(mb64
-    mb64.c mbase64.c mdebug.c)
+    mb64.c)
+target_link_libraries(mb64 mike curl)
 
 add_executable(sha1
-    sha1.c mutil.c mlog.c)
+    sha1.c)
 target_link_libraries(sha1
-    ssl crypto)
+    mike ssl crypto curl)
+
+add_executable(muri
+    muri.c)
+target_link_libraries(muri
+    mike ssl crypto curl)
 
 set(CMAKE_C_COMPILER gcc)

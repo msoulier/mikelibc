@@ -5,6 +5,8 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
+// For URI-encoding/decoding
+#include <curl/curl.h>
 
 #include "mutil.h"
 #include "mdebug.h"
@@ -315,3 +317,40 @@ char *tohex(const unsigned char *in,
     }
     return hexstring;
 }
+
+char *uriencode(const char *in, int *out_length) {
+    printf("in is %s\n", in);
+    char *out_string = NULL;
+    size_t max_output = CURL_MAX_READ_SIZE*3;
+    CURL *curl = curl_easy_init();
+    char *c_encoded = curl_easy_escape(curl, in, 0);
+    printf("c_encoded is %s\n", c_encoded);
+    *out_length = strnlen(c_encoded, max_output);
+    out_string = malloc(*out_length*sizeof(char));
+    if (out_string == NULL) {
+        goto CLEANUP;
+    }
+    strncpy(out_string, c_encoded, *out_length);
+    printf("copied to out_string: %s\n", out_string);
+CLEANUP:
+    curl_free(c_encoded);
+    curl_easy_cleanup(curl);
+    return out_string;
+}
+
+ char *uridecode(const char *in, int *out_length) {
+    char *out_string = NULL;
+    size_t max_output = CURL_MAX_READ_SIZE;
+    CURL *curl = curl_easy_init();
+    char *c_decoded = curl_easy_unescape(curl, in, 0, out_length);
+    *out_length = strnlen(c_decoded, max_output);
+    out_string = malloc(*out_length*sizeof(char));
+    if (out_string == NULL) {
+        goto CLEANUP;
+    }
+    strncpy(out_string, c_decoded, *out_length);
+CLEANUP:
+    curl_free(c_decoded);
+    curl_easy_cleanup(curl);
+    return out_string;
+ }
