@@ -18,7 +18,6 @@ main(int argc, char *argv[]) {
         if (input_buffer[strnlen(input_buffer, maximum_read)-1] == '\n') {
             input_buffer[strnlen(input_buffer, maximum_read)-1] = '\0';
         } // FIXME if not then we didn't read all of stdin
-        printf("'%s'\n", input_buffer);
     } else {
         if (strncmp(argv[1], "-h", 2) == 0) {
             fprintf(stderr, "Usage: %s [string]\nIf [string] not provided, reads from stdin.\n", argv[0]);
