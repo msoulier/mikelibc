@@ -21,7 +21,7 @@ main(int argc, char *argv[]) {
         printf("'%s'\n", input_buffer);
     } else {
         if (strncmp(argv[1], "-h", 2) == 0) {
-            fprintf(stderr, "Usage: %s [string]\nIf [string] not provided, reads from stdin.\n");
+            fprintf(stderr, "Usage: %s [string]\nIf [string] not provided, reads from stdin.\n", argv[0]);
             return 1;
         } else {
             // string is on the command-line
