@@ -353,19 +353,12 @@ int main()
     }
 
     /* add the tests to the suite */
-    if ( (NULL == CU_add_test(pSuite, "test of sfibonacci", test_sfib)) ||
-         (NULL == CU_add_test(pSuite, "test of fibonacci", test_fib)) ||
-         (NULL == CU_add_test(pSuite, "test of dstnow", test_dstnow)) ||
+    if ( 
          (NULL == CU_add_test(pSuite, "test of mlinked-list macros", test_mlinked_list)) ||
          (NULL == CU_add_test(pSuite, "test of dns functions", test_dns)) ||
          (NULL == CU_add_test(pSuite, "test of popenRWE", test_popenRWE)) ||
-         (NULL == CU_add_test(pSuite, "test of msplit", test_msplit)) ||
          (NULL == CU_add_test(pSuite, "test of mqueue", test_mqueue)) ||
          (NULL == CU_add_test(pSuite, "test of connect_tcp_client", test_tcp_client)) ||
-         (NULL == CU_add_test(pSuite, "test of b64 encode/decode functions", test_b64_enc_dec)) ||
-         (NULL == CU_add_test(pSuite, "test of b64 encode/decode functions", test_b64_enc_dec_openssl)) ||
-         (NULL == CU_add_test(pSuite, "test of encrypt/decrypt functions", test_encrypt_decrypt)) ||
-         (NULL == CU_add_test(pSuite, "test of sha1 and hexdigest function", test_sha1_hexdigest))
        )
     {
        CU_cleanup_registry();

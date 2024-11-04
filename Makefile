@@ -1,12 +1,16 @@
 #!/bin/sh
 
 debug:
-	rm -rf dist
-	mkdir dist || exit 1
-	(cd dist && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -j 5)
+	rm -rf build
+	mkdir build || exit 1
+	cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -j 5
 
 install:
-	cp dist/muri dist/mb64 dist/sha1 ${HOME}/bin
+	cp build/muri build/mb64 build/sha1 ${HOME}/bin
+
+test:
+	cd t && cmake . && cmake --build .
+	cd build && ctest
 
 clean:
-	rm -rf dist
+	rm -rf build

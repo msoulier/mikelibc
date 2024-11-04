@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -std=gnu11 -D_GNU_SOURCE -I..
-LIBS=-L.. -lmike -lcunit -lssl -lcrypto
+LIBS=-L../dist -lmike -lcunit -lssl -lcrypto -lcurl
 TESTS=
 MDEBUG=0
 MTHREADS=1
