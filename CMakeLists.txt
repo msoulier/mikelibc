@@ -10,8 +10,6 @@ project(mikelibc
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-add_compile_definitions(MDEBUG=1 MIKELIBC_THREADS=1)
-
 configure_file(config.h.in config.h @ONLY)
 
 add_library(mike STATIC
@@ -19,7 +17,8 @@ add_library(mike STATIC
 target_include_directories(mike
     PUBLIC ${CMAKE_BINARY_DIR}
            ${CMAKE_SOURCE_DIR})
-target_link_libraries(mike)
+
+target_compile_definitions(mike PUBLIC MDEBUG=1 MIKELIBC_THREADS=1)
 
 add_executable(mb64
     mb64.c)
