@@ -1,16 +1,21 @@
-#!/bin/sh
+.PHONY: build test clean debug release
+
+all: build
 
 debug:
-	rm -rf build
-	mkdir build || exit 1
-	cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -j 5
+	mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
-install:
+release:
+	cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+
+build:
+	cd build && cmake --build . -j 5
+
+install: build
 	cp build/muri build/mb64 build/sha1 ${HOME}/bin
 
-test:
-	cd t && cmake . && cmake --build .
-	cd build && ctest
+test: build
+	cd build/t && ctest
 
 clean:
 	rm -rf build

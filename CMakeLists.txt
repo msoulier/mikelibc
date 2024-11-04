@@ -16,7 +16,9 @@ configure_file(config.h.in config.h @ONLY)
 
 add_library(mike STATIC
     madt.c mbase64.c mdebug.c mikelib.c mlog.c mnet.c mstr.c mutil.c)
-target_include_directories(mike PUBLIC ${PROJECT_BINARY_DIR})
+target_include_directories(mike
+    PUBLIC ${CMAKE_BINARY_DIR}
+           ${CMAKE_SOURCE_DIR})
 target_link_libraries(mike)
 
 add_executable(mb64
@@ -33,27 +35,4 @@ add_executable(muri
 target_link_libraries(muri
     mike ssl crypto curl)
 
-set(CMAKE_C_COMPILER gcc)
-
-enable_testing()
-add_test(NAME test_version
-         COMMAND test_version
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_sha1
-         COMMAND test_sha1
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_msplit
-         COMMAND test_msplit
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_encrypt_decrypt
-         COMMAND test_encrypt_decrypt
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_b64_enc_dec
-         COMMAND test_b64_enc_dec
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_b64_enc_dec_openssl
-         COMMAND test_b64_enc_dec_openssl
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
-add_test(NAME test_dstnow
-         COMMAND test_dstnow
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/t)
+add_subdirectory(${CMAKE_SOURCE_DIR}/t)
