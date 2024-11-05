@@ -18,7 +18,12 @@ target_include_directories(mike
     PUBLIC ${CMAKE_BINARY_DIR}
            ${CMAKE_SOURCE_DIR})
 
-target_compile_definitions(mike PUBLIC MDEBUG=1 MIKELIBC_THREADS=1)
+add_compile_definitions(MIKELIBC_THREADS=1)
+
+target_compile_definitions(mike PUBLIC
+    $<$<CONFIG:Debug>:
+        MDEBUG=1
+    >)
 
 add_executable(mb64
     mb64.c)
@@ -33,5 +38,10 @@ add_executable(muri
     muri.c)
 target_link_libraries(muri
     mike ssl crypto curl)
+
+add_executable(bins
+    bins.c)
+target_link_libraries(bins
+    mike)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/t)

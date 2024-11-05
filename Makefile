@@ -3,16 +3,18 @@
 all: build
 
 debug:
-	mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
+	-mkdir build
+	cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 release:
+	-mkdir build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
 
 build:
 	cd build && cmake --build . -j 5
 
 install: build
-	cp build/muri build/mb64 build/sha1 ${HOME}/bin
+	cp build/muri build/mb64 build/sha1 build/bins ${HOME}/bin
 
 test: build
 	cd build/t && ctest

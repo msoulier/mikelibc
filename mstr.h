@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define MAX_SEPARATOR 1024
+
 /*
  * Take a string a split on whitespace, returning an array of strings.
  * This array is dynamically allocated. After you are done with it,
@@ -14,6 +16,7 @@ extern "C" {
  * as a combined delimiter. If separators is NULL, it defaults to 
  * " \t\n\r". This function does not alter the input string. The input string
  * is trusted to be properly null terminated. Be certain of your input.
+ * The separators have a maximum size of MAX_SEPARATOR (1024).
  */
 char **msplit(char *input_string, const char * const separators);
 

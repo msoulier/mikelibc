@@ -32,8 +32,8 @@ char **msplit(char *input_string, const char * const separators) {
         strcpy(seps, default_sep);
         mdebugf("using default separators\n");
     } else {
-        mdebugf("malloc of seps size %d\n", sizeof(char)*strlen(separators));
-        seps = (char *)malloc(sizeof(char)*strlen(separators));
+        mdebugf("malloc of seps size %d\n", sizeof(char)*strnlen(separators, MAX_SEPARATOR));
+        seps = (char *)malloc(sizeof(char)*strnlen(separators, MAX_SEPARATOR));
         assert( seps != NULL );
         strcpy(seps, separators);
         mdebugf("using custom separators\n");
