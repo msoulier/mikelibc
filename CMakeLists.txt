@@ -14,7 +14,7 @@ configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 add_library(mike STATIC
     madt.c mbase64.c mdebug.c mikelib.c mlog.c mnet.c mstr.c mutil.c)
-target_link_libraries(mike PUBLIC ssl crypto curl)
+target_link_libraries(mike PUBLIC ssl crypto curl pthread)
 target_include_directories(mike
     PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
            ${CMAKE_CURRENT_SOURCE_DIR})
