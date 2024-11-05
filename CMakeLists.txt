@@ -14,6 +14,7 @@ configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 add_library(mike STATIC
     madt.c mbase64.c mdebug.c mikelib.c mlog.c mnet.c mstr.c mutil.c)
+target_link_libraries(mike PUBLIC ssl crypto curl)
 target_include_directories(mike
     PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
            ${CMAKE_CURRENT_SOURCE_DIR})
@@ -27,22 +28,19 @@ target_compile_definitions(mike PUBLIC
 
 add_executable(mb64
     mb64.c)
-target_link_libraries(mb64 mike curl)
+target_link_libraries(mb64 mike)
 
 add_executable(sha1
     sha1.c)
-target_link_libraries(sha1
-    mike ssl crypto curl)
+target_link_libraries(sha1 mike)
 
 add_executable(muri
     muri.c)
-target_link_libraries(muri
-    mike ssl crypto curl)
+target_link_libraries(muri mike)
 
 add_executable(bins
     bins.c)
-target_link_libraries(bins
-    mike)
+target_link_libraries(bins mike)
 
 message("mikelibc CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/t ${CMAKE_CURRENT_BINARY_DIR}/t)

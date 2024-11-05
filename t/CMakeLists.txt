@@ -1,6 +1,6 @@
 function(create_test NAME)
     add_executable(test_${NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test_${NAME}.c)
-    target_link_libraries(test_${NAME} mike ssl crypto curl)
+    target_link_libraries(test_${NAME} mike)
     add_test(NAME test_${NAME}
              COMMAND test_${NAME})
 endfunction()
