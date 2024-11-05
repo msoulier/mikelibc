@@ -10,13 +10,13 @@ project(mikelibc
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-configure_file(config.h.in config.h @ONLY)
+configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 add_library(mike STATIC
     madt.c mbase64.c mdebug.c mikelib.c mlog.c mnet.c mstr.c mutil.c)
 target_include_directories(mike
-    PUBLIC ${CMAKE_BINARY_DIR}
-           ${CMAKE_SOURCE_DIR})
+    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+           ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_compile_definitions(MIKELIBC_THREADS=1)
 
@@ -44,4 +44,5 @@ add_executable(bins
 target_link_libraries(bins
     mike)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/t)
+message("mikelibc CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/t ${CMAKE_CURRENT_BINARY_DIR}/t)
