@@ -3,18 +3,18 @@
 all: build
 
 debug:
-	-mkdir build
+	mkdir -p build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 release:
-	-mkdir build
+	mkdir -p build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
 
 build:
 	cd build && cmake --build . -j 5
 
 install: build
-	cp build/muri build/mb64 build/sha1 build/bins ${HOME}/bin
+	for i in muri mb64 sha1 bins flink; do cp build/$$i ${HOME}/bin; done
 
 test: build
 	cd build/t && ctest

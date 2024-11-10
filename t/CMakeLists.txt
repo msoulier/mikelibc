@@ -17,5 +17,6 @@ create_test(dns)
 create_test(popenRWE)
 create_test(mqueue)
 create_test(tcp_client)
+create_test(followlink)
 
 enable_testing()

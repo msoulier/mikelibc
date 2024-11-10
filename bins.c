@@ -7,11 +7,12 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "mstr.h"
 #include "mdebug.h"
 
-#define MAXPATH 1024
+#define MAXPATH 4096
 
 void
 find_bins(const char * const dirpath, int full) {
@@ -28,8 +29,12 @@ find_bins(const char * const dirpath, int full) {
         if (entry == NULL) {
             break;
         }
-        if (entry->d_type == DT_REG) {
-            mdbgf("regular file: %s\n", entry->d_name);
+        if ((entry->d_type == DT_REG) || (entry->d_type == DT_LNK)) {
+            if (entry->d_type == DT_LNK) {
+                mdbgf("symbolic link: %s\n", entry->d_name);
+            } else {
+                mdbgf("regular file: %s\n", entry->d_name);
+            }
             char path[MAXPATH];
             sprintf(path, "%s/%s", dirpath, entry->d_name);
             mdbgf("stat of %s\n", path);

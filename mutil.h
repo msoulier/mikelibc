@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -15,6 +16,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// But defined in <linux/limits.h> .. make this portable?
+#define MAXPATH 4096
 
 uint64_t fibonacci(int n);
 
@@ -127,6 +131,16 @@ char *tohex(const unsigned char *in,
  * return string is CURL_MAX_READ_SIZE. CURL_MAX_READ_SIZE is usually 10*1024*1024.
   */
  char *uridecode(const char *in, int *out_length);
+
+/**
+ * Given the path provided, assuming that it is a symbolic link, recursively
+ * follow the link and any link it points to until we find a non-symbolic-link
+ * file. Populate the provided buffer with this path and return the number of
+ * bytes written into the buffer. Return -1 on error.
+ */
+ssize_t followlink(const char *restrict pathname,
+                   char *restrict buf,
+                   size_t bufsiz);
 
 #ifdef __cplusplus
 }

@@ -42,5 +42,9 @@ add_executable(bins
     bins.c)
 target_link_libraries(bins mike)
 
+add_executable(flink
+    flink.c)
+target_link_libraries(flink mike)
+
 message("mikelibc CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/t ${CMAKE_CURRENT_BINARY_DIR}/t)

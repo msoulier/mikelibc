@@ -5,8 +5,8 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
-// For URI-encoding/decoding
 #include <curl/curl.h>
+#include <sys/stat.h>
 
 #include "mutil.h"
 #include "mdebug.h"
@@ -351,3 +351,35 @@ CLEANUP:
     curl_easy_cleanup(curl);
     return out_string;
  }
+
+ssize_t followlink(const char *restrict pathname,
+                   char *restrict buf,
+                   size_t bufsiz)
+{
+    ssize_t nbytes = readlink(pathname, buf, bufsiz);
+    mdbgf("followlink: readlink wrote %d bytes\n", nbytes);
+    if (nbytes < 0) {
+        return nbytes;
+    } else {
+        // readlink does not null terminate
+        buf[nbytes] = '\0';
+        mdbgf("followlink: buf is %s\n", buf);
+    }
+    // Are we still pointing at a symlink?
+    struct stat statbuf;
+    if (lstat(buf, &statbuf) < 0) {
+        perror("stat");
+        return -1;
+    }
+    switch (statbuf.st_mode & S_IFMT) {
+        case S_IFLNK:
+            mdbgf("followlink: %s is a symlink, continuing\n", buf);
+            char pathname[MAXPATH];
+            strncpy(pathname, buf, nbytes);
+            return followlink(pathname, buf, bufsiz);
+            break;
+        default:
+            mdbgf("followlink: %s is not a symlink, returning\n", buf);
+            return nbytes;
+    }
+}
