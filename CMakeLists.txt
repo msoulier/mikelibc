@@ -26,6 +26,9 @@ target_compile_definitions(mike PUBLIC
         MDEBUG=1
     >)
 
+find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
+
 add_executable(mb64
     mb64.c)
 target_link_libraries(mb64 mike)
