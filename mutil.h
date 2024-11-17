@@ -138,8 +138,8 @@ char *tohex(const unsigned char *in,
  * file. Populate the provided buffer with this path and return the number of
  * bytes written into the buffer. Return -1 on error.
  */
-ssize_t followlink(const char *restrict pathname,
-                   char *restrict buf,
+ssize_t followlink(const char *pathname,
+                   char *buf,
                    size_t bufsiz);
 
 #ifdef __cplusplus

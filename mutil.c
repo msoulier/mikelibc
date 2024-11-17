@@ -352,8 +352,8 @@ CLEANUP:
     return out_string;
  }
 
-ssize_t followlink(const char *restrict pathname,
-                   char *restrict buf,
+ssize_t followlink(const char *pathname,
+                   char *buf,
                    size_t bufsiz)
 {
     ssize_t nbytes = readlink(pathname, buf, bufsiz);
