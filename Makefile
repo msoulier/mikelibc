@@ -1,3 +1,5 @@
+INSTALLROOT=$(HOME)
+
 .PHONY: build test clean debug release
 
 all: build
@@ -14,7 +16,7 @@ build:
 	cd build && cmake --build . -j 5
 
 install: build
-	for i in muri mb64 sha1 bins flink; do cp build/$$i ${HOME}/bin; done
+	for i in muri mb64 sha1 bins flink; do cp build/$$i ${INSTALLROOT}/bin; done
 
 test: build
 	cd build/t && ctest
