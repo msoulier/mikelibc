@@ -1,4 +1,16 @@
 INSTALLROOT=$(HOME)
+TEST=
+TESTCMD=
+VERBOSE=
+ARGS=
+
+ifneq ($(TEST),)
+	TESTCMD=-R $(TEST)
+endif
+
+ifeq ($(VERBOSE),1)
+	ARGS=--verbose
+endif
 
 .PHONY: build test clean debug release
 
@@ -19,7 +31,7 @@ install: build
 	for i in muri mb64 sha1 bins flink; do cp build/$$i ${INSTALLROOT}/bin; done
 
 test: build
-	cd build/t && ctest
+	cd build/t && ctest $(TESTCMD) $(ARGS)
 
 clean:
 	rm -rf build

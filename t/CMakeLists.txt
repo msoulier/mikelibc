@@ -19,4 +19,14 @@ create_test(mqueue)
 create_test(tcp_client)
 create_test(followlink)
 
+add_test(NAME setup_environment
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/followlink_setup.sh)
+
+set_tests_properties(setup_environment PROPERTIES
+    FIXTURES_SETUP my_fixture
+)
+set_tests_properties(test_followlink PROPERTIES
+    FIXTURES_REQUIRED my_fixture
+)
+
 enable_testing()

@@ -17,6 +17,7 @@ int test_b64_enc_dec_openssl(void) {
         unsigned char *decoded = base64_decode_openssl(encoded, &output_size);
         if (decoded == NULL) {
             fprintf(stderr, "FAIL: base64_decode returned NULL\n");
+            return 1;
         } else {
             decoded[output_size] = '\0';
             fprintf(stderr, "b64: orig_size %ld / result_size %ld\n",
@@ -26,6 +27,7 @@ int test_b64_enc_dec_openssl(void) {
             free(decoded);
         }
         free(encoded);
+        return 0;
     }
 }
 

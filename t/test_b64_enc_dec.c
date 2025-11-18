@@ -17,6 +17,7 @@ int test_b64_enc_dec(void) {
         unsigned char *decoded = mbase64_decode(encoded, &output_size);
         if (decoded == NULL) {
             fprintf(stderr, "FAIL: mbase64_decode returned NULL\n");
+            return 1;
         } else {
             decoded[output_size] = '\0';
             fprintf(stderr, "b64: orig_size %ld / result_size %ld\n",
@@ -26,6 +27,7 @@ int test_b64_enc_dec(void) {
             free(decoded);
         }
         free(encoded);
+        return 0;
     }
 }
 

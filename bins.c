@@ -11,17 +11,18 @@
 
 #include "mstr.h"
 #include "mdebug.h"
+#include "mlog.h"
 
 #define MAXPATH 4096
 
 void
 find_bins(const char * const dirpath, int full) {
     assert( dirpath != NULL );
-    mdbgf("===> walking dirpath %s\n", dirpath);
+    mdebugf("===> walking dirpath %s\n", dirpath);
     struct stat statbuf;
     DIR *current_dir = opendir(dirpath);
     if (current_dir == NULL) {
-        mdbgf("opendir: %s\n", strerror(errno));
+        mdebugf("opendir: %s\n", strerror(errno));
         return;
     }
     for (;;) {
@@ -31,21 +32,21 @@ find_bins(const char * const dirpath, int full) {
         }
         if ((entry->d_type == DT_REG) || (entry->d_type == DT_LNK)) {
             if (entry->d_type == DT_LNK) {
-                mdbgf("symbolic link: %s\n", entry->d_name);
+                mdebugf("symbolic link: %s\n", entry->d_name);
             } else {
-                mdbgf("regular file: %s\n", entry->d_name);
+                mdebugf("regular file: %s\n", entry->d_name);
             }
             char path[MAXPATH];
             sprintf(path, "%s/%s", dirpath, entry->d_name);
-            mdbgf("stat of %s\n", path);
+            mdebugf("stat of %s\n", path);
             if (stat(path, &statbuf) < 0) {
                 perror("stat");
                 continue;
             }
-            mdbgf("mode: %jo\n", statbuf.st_mode);
+            mdebugf("mode: %jo\n", statbuf.st_mode);
             // Do we have ownership, group or other execute permission?
             if (statbuf.st_mode & S_IXUSR|S_IXGRP|S_IXOTH) {
-                mdbgf("===> executable: %s\n", path);
+                mdebugf("===> executable: %s\n", path);
                 if (full) {
                     printf("%s\n", path);
                 } else {
@@ -70,10 +71,14 @@ main(int argc, char *argv[]) {
             }
         }
     }
+#ifdef MDEBUG
+	// Give the libraries something to log to.
+	mlog_handle_t handle = get_mlogger(MLOG_STDOUT, MLOG_DEBUG, UTC);
+#endif
 
     char path[MAXPATH];
     strncpy(path, getenv("PATH"), MAXPATH);
-    mdbgf("PATH is %s\n", path);
+    mdebugf("PATH is %s\n", path);
     char **pieces = msplit(path, ":");
 
     int i = 0;
@@ -82,7 +87,7 @@ main(int argc, char *argv[]) {
         if (piece == NULL) {
             break;
         }
-        mdbgf("%s\n", piece);
+        mdebugf("%s\n", piece);
         find_bins(piece, full);
         ++i;
     }
